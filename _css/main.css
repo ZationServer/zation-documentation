@@ -146,6 +146,13 @@ pre:after
     padding-left: 5px;
 }
 
+#zationH1
+{
+    font-family: "NexaBold";
+    font-size: 3em;
+    margin-bottom: 0.4em;
+}
+
 /*
 Make sidebar bigger
  */
@@ -193,3 +200,12 @@ body.close .sidebar {
     }
 }
 
+@font-face {
+    font-family: "NexaBold";
+    src: url("/font/NexaBold.otf") format("opentype");
+}
+
+@font-face {
+    font-family: "NexaLight";
+    src: url("/font/NexaLight.otf") format("opentype");
+}

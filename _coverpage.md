@@ -1,4 +1,7 @@
-![logo](_media/zationLogo_animated.svg)
+
+![logo](_media/logoWithBackground.svg)
+
+<h1 id="zationH1">Zation</h1>
 
 
 > Application Server Framework

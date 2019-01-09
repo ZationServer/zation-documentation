@@ -6,7 +6,7 @@ It's ideal for creating real-time apps, e.g. mobile apps with react-native, mult
 The Zation API is providing lots of functions, like a big toolbox and is well structured and documented.
 The complete framework has full typescript and promises support.
 Also its easy to use which lets you build very quickly big backends.
-The Zation framework also provides client libraries for communicating to the backend and a library for testing the server.
+The Zation framework also provides client libraries for communicating to the backend and a library for testing your server.
 Another nice feature of the Zation framework is error detection. 
 This feature will check your code for errors. 
 If fatal errors are detected the server won't start for protecting you of an unsafe or faulty backend.

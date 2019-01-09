@@ -28,4 +28,4 @@ Please consider donating if you think Zation is helpful to you or that my work i
 I am happy if you can help me. 
 Click [here](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=P3DNYQQGX3THW&source=url) to donate. :heart:
 
-<span class="center"><a href="/#/guides/gettingStarted" class="mBtn">Next</a></span>
+<span class="center"><a href="/documentation/#/guides/gettingStarted" class="mBtn">Next</a></span>

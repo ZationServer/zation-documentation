@@ -2,20 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d390873-3054-4a42-97ca-f2d9fbc45b41" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_media/favicon/android-chrome-512x512.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/font/NexaBold.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/font/NexaLight.otf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/guides/runningInProduction.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_coverpage.md" beforeDir="false" afterPath="$PROJECT_DIR$/_coverpage.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/_css/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/android-chrome-192x192.png" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/android-chrome-192x192.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/apple-touch-icon.png" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/apple-touch-icon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/favicon-16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/favicon-16x16.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/favicon-32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/favicon-32x32.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/favicon.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/mstile-150x150.png" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/mstile-150x150.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/safari-pinned-tab.svg" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/safari-pinned-tab.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_media/favicon/site.webmanifest" beforeDir="false" afterPath="$PROJECT_DIR$/_media/favicon/site.webmanifest" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_sidebar.md" beforeDir="false" afterPath="$PROJECT_DIR$/_sidebar.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.md" beforeDir="false" afterPath="$PROJECT_DIR$/main.md" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -29,18 +18,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/_sidebar.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="195">
-                <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/_coverpage.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
@@ -57,7 +34,7 @@
         <entry file="file://$PROJECT_DIR$/guides/gettingStarted.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="345">
+              <first_editor relative-caret-position="322">
                 <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
               </first_editor>
               <second_editor />
@@ -69,8 +46,32 @@
         <entry file="file://$PROJECT_DIR$/main.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="390">
-                <caret line="26" column="92" lean-forward="true" selection-start-line="26" selection-start-column="92" selection-end-line="26" selection-end-column="92" />
+              <first_editor relative-caret-position="465">
+                <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/guides/runningInProduction.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor>
+                <caret column="23" lean-forward="true" selection-start-column="23" selection-end-column="23" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/_sidebar.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="405">
+                <caret line="27" column="56" selection-start-line="27" selection-start-column="56" selection-end-line="27" selection-end-column="56" />
               </first_editor>
               <second_editor />
             </state>
@@ -98,11 +99,6 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/_media/zationLogo_animated.svg">
-          <provider selected="true" editor-type-id="images" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/_media/favicon/android-chrome-384x384.png">
           <provider selected="true" editor-type-id="images" />
         </entry>
       </file>
@@ -167,13 +163,14 @@
         <option value="$PROJECT_DIR$/_code/addController.ts" />
         <option value="$PROJECT_DIR$/_code/controllerUserStateAccess.ts" />
         <option value="$PROJECT_DIR$/guides/server/advancedBags.md" />
-        <option value="$PROJECT_DIR$/_sidebar.md" />
         <option value="$PROJECT_DIR$/guides/server/basicsBags.md" />
         <option value="$PROJECT_DIR$/guides/server/userGroups.md" />
         <option value="$PROJECT_DIR$/guides/server/controller.md" />
         <option value="$PROJECT_DIR$/_media/logoWithBackground.svg" />
         <option value="$PROJECT_DIR$/_coverpage.md" />
         <option value="$PROJECT_DIR$/_css/main.css" />
+        <option value="$PROJECT_DIR$/guides/runningInProduction.md" />
+        <option value="$PROJECT_DIR$/_sidebar.md" />
         <option value="$PROJECT_DIR$/main.md" />
       </list>
     </option>
@@ -193,11 +190,6 @@
             <path>
               <item name="zation-documentation" type="b2602c69:ProjectViewProjectNode" />
               <item name="zation-documentation" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="zation-documentation" type="b2602c69:ProjectViewProjectNode" />
-              <item name="zation-documentation" type="462c0819:PsiDirectoryNode" />
-              <item name="_code" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="zation-documentation" type="b2602c69:ProjectViewProjectNode" />
@@ -288,12 +280,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1546431144418</updated>
-      <workItem from="1546431145817" duration="28673000" />
+      <workItem from="1546431145817" duration="29254000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="28673000" />
+    <option name="totallyTimeSpent" value="29254000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -656,16 +648,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_sidebar.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="195">
-            <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/_media/favicon/android-chrome-384x384.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -698,10 +680,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/guides/runningInProduction.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor>
+            <caret column="23" lean-forward="true" selection-start-column="23" selection-end-column="23" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_sidebar.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="405">
+            <caret line="27" column="56" selection-start-line="27" selection-start-column="56" selection-end-line="27" selection-end-column="56" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/guides/gettingStarted.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="345">
+          <first_editor relative-caret-position="322">
             <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
           </first_editor>
           <second_editor />
@@ -711,8 +713,8 @@
     <entry file="file://$PROJECT_DIR$/main.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="390">
-            <caret line="26" column="92" lean-forward="true" selection-start-line="26" selection-start-column="92" selection-end-line="26" selection-end-column="92" />
+          <first_editor relative-caret-position="465">
+            <caret line="31" lean-forward="true" selection-start-line="31" selection-end-line="31" />
           </first_editor>
           <second_editor />
         </state>

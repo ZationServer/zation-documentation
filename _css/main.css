@@ -29,6 +29,39 @@ code
     color: aliceblue !important;
 }
 
+.txt-center
+{
+    text-align: center;
+}
+
+h4,h5
+{
+    padding-bottom: 0 !important;
+    margin-bottom: 0.5em !important;
+}
+
+h5
+{
+    font-size: 1.15rem !important;
+}
+
+h4
+{
+    font-size: 1.4rem !important;
+}
+
+h4 + p, h5 + p {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.5em !important;
+    padding-bottom: 0 !important;
+}
+
+.pad-d
+{
+    padding-bottom: 0.2em;
+}
+
 pre:after
 {
     color: black !important;
@@ -122,6 +155,24 @@ Make sidebar bigger
 }
 .content {
     left:350px !important;
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.container {
+    padding: 2px 16px;
+    text-align: center;
+}
+
+.figure {
+    font-style: italic;
 }
 
 body.close .sidebar {

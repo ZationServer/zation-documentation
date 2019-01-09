@@ -2,7 +2,7 @@
 
 Zation is an application server framework which lets you build fast, real-time, secure and scalable backends. 
 You can scale it on more CPU cores or machines/instances. 
-It's ideal for creating real-time apps e.g mobile apps with react-native, multiplayer games or real-time statistic apps.
+It's ideal for creating real-time apps, e.g. mobile apps with react-native, multiplayer games or real-time statistic apps.
 The Zation API is providing lots of functions, like a big toolbox and is well structured and documented.
 The complete framework has full typescript and promises support.
 Also its easy to use which lets you build very quickly big backends.
@@ -18,9 +18,9 @@ Zation will offer more than one client driver in different programming languages
 At the moment there is only one client driver in JavaScript, so you have to write your client in JavaScript.
 
 The developer of the Zation framework is Luca Scaringella. 
-The framework will constantly be maintained and improved.
+The framework will continuously be maintained and improved.
 
-> If you really don't know how you can implement something after reading this documentation. Try to look in the documentation of the Zation API. If this not helps, you can send me a message to <a href="mailto:info@zation.de">info@zation.de</a>.
+> If you don't know how you can implement something after reading this documentation, try to look in the documentation of the Zation API. If this not helps, you can send me a message to <a href="mailto:info@zation.de">info@zation.de</a>.
 
 ## Donate
 

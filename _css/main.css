@@ -131,6 +131,14 @@ pre:after
     opacity: .7;
 }
 
+.markdown-section figure, .markdown-section p {
+    margin: 0.3rem 0 !important;
+}
+
+.markdown-section h2{
+    margin: 25px 0 .8rem !important;
+}
+
 .center {
    left: 50%;
    margin-left: -10%;

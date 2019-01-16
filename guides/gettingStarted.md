@@ -1,6 +1,5 @@
 # Getting Started
-
-In this Chapter, I want to show you how to install Zation with the node package manager and create a Zation project by using the command line.
+This page will help you to install Zation with the Node.Js package manager and to create your first project by using the command line.
 
 ## Install Zation
 
@@ -11,7 +10,7 @@ To install Zation, you only need to run this command in your terminal:
 
 [](../_code/install.sh ':include :type=bash')
 
-!> **Problems ?** If you have any problems on a Unix based machine while executing a command try to run it with sudo.
+!> **Problems ?** If you have any access problems with executing a command, you can try to run it with sudo or start the console as an admin.
 
 ## Structure of Projects
 

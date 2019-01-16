@@ -3,6 +3,9 @@ static config : ControllerConfig = {
     //Only the clients with the user id 10 have access to this controller.
     access : 10,
 
+    //All clients have access to this controller except the client with user id 10.
+    notAccess : 10,
+
     //Only the clients with the user id 10, 13 or 5 have access to this controller.
     access : [10,13,5],
 

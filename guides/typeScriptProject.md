@@ -17,9 +17,9 @@ You can read more about it [here](https://www.typescriptlang.org/docs/handbook/t
 The generated translated JavaScript code will be stored in the dist folder.
 The file gulpFile.js contains the logic for automatically building the JavaScript code.
 
-You can run the build with the command npm run build.
-If you want that Gulp is automatically run the build if you change a file, you can use the command npm run watch. 
-By default, Zation is running automatically the build every time before starting the project with npm start.
+You can run the build with the command <b>npm run build</b>.
+If you want that Gulp is automatically run the build if you change a file, you can use the command <b>npm run watch</b>. 
+By default, Zation is running automatically the build every time before starting the project with <b>npm start</b>.
 If you don't want that, you can change the prestart property of the scripts object in the package.json file. 
 If you don't know anything about the package.json file, you can read about it [here](https://docs.npmjs.com/files/package.json).
 

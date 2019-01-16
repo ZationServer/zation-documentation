@@ -3,7 +3,8 @@ static config : ControllerConfig = {
     //Only the clients with the user id 10 have access to this controller.
     access : 10,
 
-    //All clients have access to this controller except the client with user id 10.
+    //All clients have access to this controller except the clients
+    //with the user id 10.
     notAccess : 10,
 
     //Only the clients with the user id 10, 13 or 5 have access to this controller.
@@ -12,14 +13,14 @@ static config : ControllerConfig = {
     //Only the clients with user group admin have access to this controller.
     access : 'admin',
 
-    //Only the clients with user group admin or default user group guest
+    //Only the clients with the user group admin or default user group guest
     //have access to this controller.
     access : ['guest','user'],
 
-    //Only the clients with user group admin or user have access to this controller.
+    //Only the clients with the user group admin or user have access to this controller.
     access : ['admin','user'],
 
-    //Only the clients with user group admin or user id 3 or 2 have
+    //Only the clients with the user group admin or the user id 3 or 2 have
     //access to the controller.
     access : ['admin',2,3],
 

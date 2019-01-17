@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d390873-3054-4a42-97ca-f2d9fbc45b41" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/_code/httpMethodAccess.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_code/protocolAccess.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/_code/versionAccess.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_code/inputAllAllow.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/_code/inputValidation.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_code/controllerUserStateAccess.ts" beforeDir="false" afterPath="$PROJECT_DIR$/_code/controllerUserStateAccess.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/guides/server/controller.md" beforeDir="false" afterPath="$PROJECT_DIR$/guides/server/controller.md" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -20,14 +18,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/guides/server/controller.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="319">
-                <caret line="84" column="29" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
+              <first_editor relative-caret-position="346">
+                <caret line="125" column="118" selection-start-line="125" selection-start-column="118" selection-end-line="125" selection-end-column="118" />
               </first_editor>
               <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/_code/inputValidation.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/_code/inputAllAllow.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="2" lean-forward="true" selection-end-line="12" selection-end-column="2" />
             </state>
           </provider>
         </entry>
@@ -41,7 +57,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/_code/versionAccess.ts">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="180">
@@ -83,18 +99,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/guides/server/userGroups.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="390">
-                <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
-              </first_editor>
-              <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/guides/server/basicsBags.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
@@ -102,15 +106,6 @@
                 <caret line="18" column="69" selection-start-line="18" selection-start-column="69" selection-end-line="18" selection-end-column="69" />
               </first_editor>
               <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/_css/main.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="138" column="19" selection-start-line="138" selection-start-column="19" selection-end-line="138" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -182,8 +177,10 @@
         <option value="$PROJECT_DIR$/_code/controllerUserStateAccess.ts" />
         <option value="$PROJECT_DIR$/_code/protocolAccess.ts" />
         <option value="$PROJECT_DIR$/_code/httpMethodAccess.ts" />
-        <option value="$PROJECT_DIR$/guides/server/controller.md" />
         <option value="$PROJECT_DIR$/_code/versionAccess.ts" />
+        <option value="$PROJECT_DIR$/_code/inputAllAllow.ts" />
+        <option value="$PROJECT_DIR$/_code/inputValidation.ts" />
+        <option value="$PROJECT_DIR$/guides/server/controller.md" />
       </list>
     </option>
   </component>
@@ -300,12 +297,12 @@
       <updated>1546431144418</updated>
       <workItem from="1546431145817" duration="29460000" />
       <workItem from="1547066815409" duration="26000" />
-      <workItem from="1547593928619" duration="11929000" />
+      <workItem from="1547593928619" duration="15920000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41415000" />
+    <option name="totallyTimeSpent" value="45406000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -348,26 +345,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.sh" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/guides/server/streams.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="30">
-            <caret line="2" selection-start-line="2" selection-end-line="2" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/guides/client/streams.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="90">
-            <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/_code/basicControllerConfig1.js" />
     <entry file="file://$PROJECT_DIR$/_code/basicControllerConfig2.js" />
     <entry file="file://$PROJECT_DIR$/guides/server/arrays.md">
@@ -650,27 +627,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_code/protocolAccess.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="20" selection-end-line="14" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/_code/httpMethodAccess.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="66" selection-end-line="14" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/guides/server/controller.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="319">
-            <caret line="84" column="29" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -685,6 +645,37 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="12" column="32" lean-forward="true" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_code/protocolAccess.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="20" selection-end-line="14" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_code/inputAllAllow.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="2" lean-forward="true" selection-end-line="12" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_code/inputValidation.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/guides/server/controller.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="346">
+            <caret line="125" column="118" selection-start-line="125" selection-start-column="118" selection-end-line="125" selection-end-column="118" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

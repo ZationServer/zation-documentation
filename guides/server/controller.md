@@ -62,8 +62,8 @@ This chapter will explain more about the controller configuration.
 It will demonstrate all the possibilities you have to configure a controller.
 
 #### Access
-One of the important configurations is the access configuration. 
-But we have multiple possibilities to define access rights. 
+One of the possibilities is to define access rights for a controller.
+But we have multiple opportunities to define access rights. 
 This chapter will explain all the different options. 
 Note that you can combine all of these options.
 
@@ -115,6 +115,26 @@ Below you can see some examples.
 [](../../_code/versionAccess.ts ':include :type=ts')
 
 #### Input 
+
+Another possibility is to define the input of a controller.
+This feature is massive it can validate, check the structure or change the input of a request. 
+Zation will check the input with the input rules, and when there are any errors, then these errors will send back to the client, and the request will end. 
+This chapter will explain the basics of the input property. 
+
+The value of the input property must be an object. 
+The default value of this property is an empty object, that means that no input is allowed. 
+If you want that every input is allowed and the rules should be ignored, then you can use the property inputAllAllow. 
+Below you can see an example.
+
+[](../../_code/inputAllAllow.ts ':include :type=ts')
+
+If you want to disable the input validation, you can use the property inputValidation. 
+Note that Zation will still check the structure. 
+For example, you want a name in the input which is at least five characters long. 
+If you disable the validation, Zation will not check the length but will still check if there is a name.
+Below you can see how you can activate and deactivate the validation.
+
+[](../../_code/inputValidation.ts ':include :type=ts')
 
 ### Controller Logic 
 

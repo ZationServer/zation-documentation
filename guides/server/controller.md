@@ -67,9 +67,9 @@ But we have multiple opportunities to define access rights.
 This chapter will explain all the different options. 
 Note that you can combine all of these options.
 
-##### Client Token State Access
+##### Token State Access
 
-With the client token state access, we can set access rights which depends on the actual state of a token. 
+With the token state access, we can set access rights which depends on the actual state of a token. 
 That can be for example the user group, user id or additional token variables.
 
 !> **Token ?** The token is like an id card of a client. The client only has a token when its authenticated. You also can set individual variables on a token with the bag.

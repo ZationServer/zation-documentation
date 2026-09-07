@@ -1,164 +1,152 @@
 # Controller
 
-The Zation framework is structured with controllers. 
-Each controller is one service that your backend is providing. 
-For example, a controller can be a service to register a user, send a message, publish a post, authenticate a user or upload a profile avatar. 
-How many or what controllers you have depends on your use cases. 
+A Controller handles a request from a client and sends a response back.
+Each controller is one service that your backend provides, for example registering a user, sending a message or publishing a post.
 
-Different layers are protecting each controller, this useful for example setting access rights for a controller. 
-One use case can be that only admins can access the controller for deleting a user. 
-The controllers can be added in the app configuration. 
-The business logic and configuration of each controller should be located in the specific controller class. 
-How this works will be explained in this chapter by showing you example controller code. 
-This chapter will also explain the purpose of the authentication controller and how you can set default values for every controller.
+## Define a Controller
 
-## Create Controller
+You can generate a controller with `zation createComponent <Name>` or create the file manually:
 
-This chapter will help you to create your controllers. 
-It will explain what possibilities you have to configure them and how they are work.
-We will be beginning by creating a basic skeletal controller structure and add the controller to the app configuration. 
-Then you will learn more about the controller configuration and how you can set up the logic of a controller.
+```typescript
+import {Controller, Socket, Packet, BackErrorBag} from "zation-server";
 
-### Define a Basic Controller
+@Controller.Config({
+    access: 'all',
+})
+export default class SendMessage extends Controller {
 
-The controller consists of two parts. 
-The first part is the controller configuration where you can configure the different layers there are protecting the controller and some basic controller options. 
-The second part is the business logic of the controller it describes what happens when the controller gets a request.  
-This subchapter will show you where and how you can define these parts and how you can connect your controller to the framework.
+    async initialize() {
+        // called once when the server starts
+    }
 
-First, we create a controller file. 
-To beginning with a basic template, we are using the following command in the terminal:
+    async handle(socket: Socket, input: any, packet: Packet) {
+        return {sent: true};
+    }
 
-[](../../_code/initController.sh ':include :type=bash')
+    async invalidInput(socket: Socket, rawInput: any, packet: Packet, backErrorBag: BackErrorBag) {
+        // called when the input validation failed
+    }
 
-You can optionally run the command with a path than the controller will be created at this path relative to your current directory. 
-While running this command, Zation will ask you if you are using a TypeScript project and what the name of the controller should be. 
-After answer, these questions and executing you should find a file which looks similar to the code below.
+}
+```
 
-!> **Problems ?**  If you have problems with the terminal command, then you can create a new file manually and copy the template from the code example.
+Then register it with a [Router or the Register decorator](guides/server/components.md).
 
-[](../../_code/controllerTemplate.ts ':include :type=ts')
+## Configuration
 
-You can see in the code, that each controller needs to extend the main Controller class from the Zation framework.
-The controller configuration part is located in the static config property of each controller class. 
-The methods of the class are the business logic of each controller. 
-The next Chapters will explain more about it.
+| Option | Default | Description |
+| --- | --- | --- |
+| `access` | from `controllerDefaults`, otherwise denied | Access rules, see [Access Rules](guides/server/accessRules.md). |
+| `input` | `'nothing'` | Input model, `'any'` or `'nothing'`, see [Models](guides/server/models.md). |
+| `backErrorCollectionLimit` | | Maximum number of collected errors before the response is sent. |
 
-The next step is to add the controller to the app configuration so Zation can find the controller.
-To do this, we first need to import the controller in the app configuration. 
-After that, we can add it to the controllers object.
-The property key is the controller id, and the value will be the imported controller class. 
-The controller id must be unique and will be used to identify a controller when the client is communicating to the backend.
-You can see it at the example code below.
+Defaults for all controllers can be defined with `controllerDefaults` in the app config.
 
-[](../../_code/addController.ts ':include :type=ts')
+## Handle
 
-After that, we successful defined a basic controller.
-The next step is to configure this controller and add some logic.
+The `handle` method receives the socket, the validated (and converted) input and the packet.
+The returned value is sent back to the client as the result. It can be any JSON-compatible data; binaries and streams are supported too (see [Streams](guides/server/streams.md)).
 
-### Controller Configuration
+```typescript
+@Controller.Config({
+    access: 'allAuth',
+    input: {
+        properties: {
+            chatId: {type: 'string'},
+            text: {type: 'string', maxLength: 500}
+        }
+    }
+})
+export default class SendMessage extends Controller {
 
-This chapter will explain more about the controller configuration. 
-It will demonstrate all the possibilities you have to configure a controller.
+    @Inject(ChatChannel)
+    private readonly chatChannel: ChatChannel;
 
-#### Access
-One of the possibilities is to define access rights for a controller.
-But we have multiple opportunities to define access rights. 
-This chapter will explain all the different options. 
-Note that you can combine all of these options.
+    async handle(socket: Socket, {chatId, text}: {chatId: string, text: string}) {
+        const message = {userId: socket.userId, text, created: Date.now()};
+        // persist the message ...
+        this.chatChannel.publish(chatId, 'message', message);
+        return message;
+    }
 
-##### Token State Access
+}
+```
 
-With the token state access, we can set access rights which depends on the actual state of a token. 
-That can be for example the user group, user id or additional token variables.
+The `Packet` gives you access to `packet.apiLevel` and a request-scoped `packet.attachment` object where you can store data for this request.
 
-!> **Token ?** The token is like an id card of a client. The client only has a token when its authenticated. You also can set individual variables on a token with the bag.
+## Errors
 
-To set some rules, we are using the property access or the inverted property notAccess, only one of them is allowed.
-If you do not specify either of them, the access will be denied. 
-Below you can see some examples what the value could be.
+To send errors back to the client, throw a `BackError` or a `BackErrorBag`:
 
-[](../../_code/controllerUserStateAccess.ts ':include :type=ts')
+```typescript
+import {BackError, BackErrorBag, ErrorType} from "zation-server";
 
-##### Protocol Access
+async handle(socket: Socket, {email}) {
+    if(await userExists(email)) {
+        throw new BackError({
+            name: 'emailAlreadyExists',
+            group: 'register',
+            type: ErrorType.InputError,
+            description: 'The email is already registered.',
+            sendInfo: true
+        }, {email});
+    }
+}
+```
 
-With the protocol access, you can set access rights which depends on the request protocol.
-That can be useful to avoid the MethodIsNotCompatible error. 
-This error can happen by calling a function on the bag which is only available on a specific protocol.
+A `BackError` consists of a `name`, an optional `group`, a `type` (see `ErrorType`), a `description` and an `info` object.
+The `description` is only sent to the client when `sendErrorDescription` is enabled in the server config.
+The `info` is only sent when `sendInfo` is `true`. Mark errors that must not leave the server with `private: true`.
 
-To set some rules, you have the two properties wsAccess and httpAccess.
-Both are taking a boolean as a value and have the default value true.
-In the code below you can see some examples.
+Multiple errors can be collected in a `BackErrorBag`:
 
-[](../../_code/protocolAccess.ts ':include :type=ts')
+```typescript
+const errorBag = new BackErrorBag();
+if(!validName) errorBag.add(new BackError('invalidName'));
+if(!validAge) errorBag.add(new BackError('invalidAge'));
+errorBag.throwIfHasError();
+```
 
-##### HTTP Method Access
+Every other thrown error is treated as an unknown error: the `error` event is triggered, and the client receives an `UnknownError` without details.
 
-With the HTTP method access, you can define access rights which depends on the requested HTTP method. 
-These access rights will only be used when the request protocol is HTTP.
+## Invalid Input
 
-To set these access rights, we have two properties the httpGetAllowed and httpPostAllowed property. 
-Both of them taking a boolean as a value and have the default value true.
-Below you can see some examples.
-
-[](../../_code/httpMethodAccess.ts ':include :type=ts')
-
-##### Version Access
-
-With the version access, you can set access rights which depends on the version and system of the client.
-
-To set rules, you have to use the property versionAccess. 
-There is no default value, so if you don't provide this property, the version and system will just not be checked. 
-The value of this property must be an object where you can specify the rules.
-Below you can see some examples.
-
-[](../../_code/versionAccess.ts ':include :type=ts')
-
-#### Input 
-
-Another possibility is to define the input of a controller.
-This feature is massive it can validate, check the structure or change the input of a request. 
-Zation will check the input with the input rules, and when there are any errors, then these errors will send back to the client, and the request will end. 
-This chapter will explain the basics of the input property. 
-
-The value of the input property must be an object. 
-The default value of this property is an empty object, that means that no input is allowed. 
-If you want that every input is allowed and the rules should be ignored, then you can use the property inputAllAllow. 
-Below you can see an example.
-
-[](../../_code/inputAllAllow.ts ':include :type=ts')
-
-If you want to disable the input validation, you can use the property inputValidation. 
-Note that Zation will still check the structure. 
-For example, you want a name in the input which is at least five characters long. 
-If you disable the validation, Zation will not check the length but will still check if there is a name.
-Below you can see how you can activate and deactivate the validation.
-
-[](../../_code/inputValidation.ts ':include :type=ts')
-
-### Controller Logic 
-
-#### Handle 
-
-##### Return Result
-
-##### Error Handling
-
-#### Other Methods
-
-## The Controller Defaults
+When the input validation fails, Zation sends the validation errors to the client automatically and calls the `invalidInput` method.
+You can use it to add custom errors to the `backErrorBag` or to log the attempt.
 
 ## The Authentication Controller
 
-The authentication controller is a special controller that you can configure in the app Configuration. 
-The purpose of this controller is to authenticate a user. 
-Zation will automatically use this controller when the client is sending an authentication request. 
-If you don't configure an authentication controller the server will respond with a task error when getting an authentication request. 
-So it is recommended to set an authentication controller.  
-In the code below you can see how to set the authentication controller in the app configuration.
+The `AuthController` is a special controller used to authenticate a client.
+There can only be one authentication controller in the app, and the client can call it with `client.authenticate(data)`.
+The handle method must call `socket.authenticate` when the credentials are valid; otherwise, the client receives an `AuthenticationFailedError`.
 
-[](../../_code/authenticationController.ts ':include :type=ts')
+```typescript
+import {AuthController, Socket, BackError, ObjectModel, ModelProp} from "zation-server";
 
-The value should be the controller id that is defined as a key of a controller in the controllers object.
+@ObjectModel()
+class Credentials {
+    email = ModelProp({type: 'email'});
+    password = ModelProp({type: 'string', minLength: 3});
+}
 
- 
+@Controller.Config({
+    access: 'allNotAuth',
+    input: Credentials
+})
+export default class Login extends AuthController {
+
+    async handle(socket: Socket, {email, password}: Credentials) {
+        const user = await findUser(email, password);
+        if(!user) throw new BackError('invalidCredentials');
+        await socket.authenticate('user', user.id, {email});
+    }
+
+}
+```
+
+Read the [Authentication](guides/server/authentication.md) chapter for details about tokens.
+
+## Validation Requests
+
+Clients can validate input against the input model of a controller without executing the handle method (`client.requestValidation`).
+The number of checks per request is limited by `validationCheckLimit` in the server config.

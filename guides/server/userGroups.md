@@ -1,26 +1,51 @@
 # User Groups
 
-The Zation framework is using user groups for defining access rights. 
+The Zation framework uses user groups to define access rights. 
 The user groups are split into two types: the authentication groups and the default group. 
-The default group will be used when the client is not authenticated, so the client is like a guest.
-When we authenticate a client, the client will get a token. 
-This token is like an id card and contains the current authentication user group and much more information.
-That means that the client belongs to an authentication user group and not anymore to the default group.
-Note that you only can have one default group and multiple authentication groups. 
-This chapter will explain how you can declare them. 
-Later, we will use these user groups.
+The default group is used when the client is not authenticated, so the client is like a guest.
+When a client is authenticated, the client gets a signed JSON web token. 
+This token is like an id card and contains the authenticated user group, an optional user id and a custom payload.
+That means that an authenticated client belongs to an authentication user group and no longer to the default group.
+You can only have one default group but multiple authentication groups.
+
 ## Declare
 
-The user groups can be defined in the app configuration. 
+The user groups are defined in the app configuration:
 
-[](./../../_code/userGroups.js ':include :type=js')
+```typescript
+Config.appConfig({
+    userGroups: {
+        auth: {
+            admin: {
+                panelDisplayName: 'Administrator'
+            },
+            user: {},
+        },
+        default: 'guest'
+    }
+}).register();
+```
 
-The name of the default user group can be set with the property default of the user groups object.
-Your authentication user groups can be defined in the property auth of the user group object.
+The name of the default user group is set with the property `default`.
+Your authentication user groups are defined in the property `auth`.
 Every user group name must be unique.
-The value of the authentication user groups needs to be an object because with that object you can specify extra advanced options for this user group.
+The value of an authentication user group is an object with optional advanced options:
 
-!> **Warning !** You also can't use these reserved keywords as a user group name:  allAuth, allNotAuth and all.
+| Option | Description |
+| --- | --- |
+| `panelDisplayName` | The name of the group displayed in the panel. |
+| `panelAccess` | If `true`, members of this group automatically have access to the panel. |
 
+!> **Warning !** You can't use the reserved keywords `all`, `allAuth` and `allNotAuth` as a user group name.
 
+## Usage
 
+The user groups are used in the access rules of components, see [Access Rules](guides/server/accessRules.md).
+A client is moved into an authentication group with `socket.authenticate('user')`, see [Authentication](guides/server/authentication.md).
+
+```typescript
+socket.userGroup;         // current user group of the socket (default group when not authenticated)
+socket.authUserGroup;     // auth user group or undefined
+bag.authUserGroupNames;   // all defined auth user group names
+bag.defaultUserGroupName; // name of the default user group
+```

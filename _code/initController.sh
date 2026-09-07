@@ -1,1 +1,0 @@
-zation initController [path]

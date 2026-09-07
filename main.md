@@ -11,16 +11,15 @@ Another nice feature of the Zation framework is code error detection.
 This feature will check your code for errors. 
 If fatal errors are detected the server won't start for protecting you of an unsafe or faulty backend.
 
-The Zation backend framework is written in Typescript and uses the µWebSockets library which is written in C++. 
-So you have to use Typescript or JavaScript to write your backend code. 
-For communication to the client, Zation is using the HTTP and WebSocket protocol. 
-Zation will offer more than one client driver in different programming languages. 
-At the moment there is only one client driver in JavaScript, so you have to write your client in JavaScript.
+The Zation backend framework is written in TypeScript and uses the µWebSockets library which is written in C++. 
+So you have to use TypeScript or JavaScript to write your backend code. 
+For communication with the client, Zation uses the WebSocket protocol (based on the Ziron engine) with support for JSON, binary data and streams. 
+At the moment there is one client library for TypeScript/JavaScript (browser and Node.js) and a React toolkit.
 
 The developer of the Zation framework is Luca Scaringella. 
 The framework will continuously be maintained and improved.
 
-> If you don't know how you can implement something after reading this documentation, try to look in the documentation of the Zation API. If this not helps, you can send me a message to <a href="mailto:info@zation.de">info@zation.de</a>.
+> This documentation covers Zation 3. If you don't know how to implement something after reading it, look at the JSDoc of the Zation API in your IDE (every option and method is documented) or at the [integration tests](https://github.com/ZationServer/zation-integration-test). If this does not help, you can send me a message to <a href="mailto:info@zation.de">info@zation.de</a>.
 
 ## Donate
 

@@ -88,15 +88,18 @@ These middlewares decide whether an action is allowed. Multiple functions are ch
 | `authenticate` | `(token)` | Block JSON web tokens, e.g. revoked tokens. |
 | `panelAuth` | `(username, password)` | Allow panel logins that are not defined in the server config. |
 
-A `Block` can carry a code and data that are sent to the client:
+A `Block` can carry a code and a message that are sent to the client:
 
 ```typescript
 import {Block} from "zation-server";
 
 socket: (socket) => {
-    if(isBanned(socket.remoteAddress)) throw new Block(4403, 'banned');
+    if(isBanned(socket.remoteAddress)) throw new Block(4503, 'banned');
+    if(maintenance) throw new Block(4403, 'maintenance');
 }
 ```
+
+The default block code is `4503`. Codes from `4500` upwards are permanent: the client does not try to reconnect automatically. Use a code below `4500` (e.g. `4403`) for temporary blocks, then the client keeps reconnecting with backoff.
 
 ### Standard Middlewares
 

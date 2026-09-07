@@ -70,6 +70,8 @@ await client.ping();             // round trip time in ms
 
 Packages sent while the client is disconnected are buffered and flushed after the connection is established (see `sendTimeout` and `maxPackageBufferSize`).
 
+The client reconnects automatically after a connection loss, except when the connection was closed with code `1000` or a code from `4500` upwards (permanent disconnects, e.g. a block by the socket middleware). Call `connect()` again to retry manually.
+
 ## Authentication
 
 ```typescript

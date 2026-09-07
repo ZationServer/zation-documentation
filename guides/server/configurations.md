@@ -99,7 +99,7 @@ log: {
 ```
 
 The log levels are: `6` debug, `5` info/busy, `4` warn, `3` error, `2` failed/fatal, `1` active, `0` nothing.
-When file logging with download is active, the log file can be downloaded at `http://host:port/log/<accessKey>`.
+When file logging with download is active, the log file can be downloaded at `http://host:port/log/<accessKey>`. The download is refused when no access key is configured, so always set a long random key.
 
 ## App Config
 

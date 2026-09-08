@@ -2,6 +2,19 @@
 
 The official documentation website of the Zation framework.
 
+**Read it online:** https://zationserver.github.io/zation-documentation/
+
+The site is built with [docsify](https://docsify.js.org) and deployed to GitHub Pages by the
+workflow in `.github/workflows/pages.yml` on every push to `master`.
+To run it locally, serve the repository folder with any static file server, for example:
+
+```bash
+npx serve .
+```
+
+Opening `index.html` directly from the file system does not work because docsify loads the
+markdown pages over HTTP.
+
 <h1 align="center">
   <!-- Logo -->
   <br/>

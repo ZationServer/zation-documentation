@@ -5,7 +5,7 @@ This chapter summarizes what to check before running a Zation server on a public
 ## Checklist
 
 * Start the server in **production mode** (`MODE=p`). Debug logging is disabled, and the config check is faster.
-* Provide a **license** (`license` option or `ZATION_LICENSE` env) - a valid license is required for public or commercial use.
+* Provide a **license** (`license` option or `ZATION_LICENSE` env) - a valid license is required for public or commercial use. Without one the server starts but logs a warning at every start.
 * Set a fixed **auth secret** (`auth.secretKey` or a key pair) so that tokens survive restarts and are valid on every instance.
 * Restrict the allowed **origins** to your domains.
 * Enable **TLS** (`tls` option) or terminate TLS at a reverse proxy / load balancer.

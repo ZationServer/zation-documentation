@@ -41,7 +41,7 @@ The server config describes the technical settings of the server instance. Every
 | `port` | `3000` | Port where the server listens. |
 | `hostname` | `'localhost'` | Hostname of the server. |
 | `path` | `''` | URL path of the server. |
-| `license` | Free Trial | Your Zation license key. Required for public or commercial usage. |
+| `license` | none | Your Zation license key. Required for public or commercial usage; without it the server starts in every mode and logs that it is unlicensed. |
 | `origins` | `null` (all) | Allowed origins, e.g. `'example.de:*'` or `['example.de','api.example.de:443']`. The check uses the `Origin` header of the browser; requests without an `Origin` header (e.g. Node.js clients) are rejected when origins are restricted. The health endpoint is always reachable. |
 | `tags` | | Meta information displayed in the panel, e.g. `[['region','eu']]` or `'region:eu,canary'`. |
 | `debug` | `false` | Console logs about the status and actions of connected clients (disabled in production mode). |

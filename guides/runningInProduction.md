@@ -60,13 +60,13 @@ The state and broker processes read `SECRET`, `JOIN`, `PORT`, `SERVER_PATH` and 
 The CLI generates a multi-stage `Dockerfile`:
 
 ```dockerfile
-FROM node:20 AS build
+FROM node:22 AS build
 WORKDIR /usr/app/
 COPY . .
 RUN npm ci
 RUN npm run build
 
-FROM node:20-slim
+FROM node:22-slim
 WORKDIR /usr/app
 ENV MODE=p
 COPY package*.json ./

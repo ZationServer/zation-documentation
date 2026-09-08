@@ -4,7 +4,7 @@ This page helps you to install the Zation CLI and to create your first server an
 
 ## Requirements
 
-Zation runs on Node.js. Install a current LTS version of Node.js (16 or newer) by following these [instructions](https://nodejs.org/en/download/package-manager/).
+Zation runs on Node.js 22, 24 or 26 (the versions supported by the bundled uWebSockets binaries). Install a current LTS version by following these [instructions](https://nodejs.org/en/download/package-manager/).
 Zation is written in TypeScript, and all guides in this documentation use TypeScript. 
 It is strongly recommended to write your backend in TypeScript too, because the framework relies on decorators and you get full type checking and IDE support.
 

@@ -67,7 +67,7 @@ protected async fetch(request: FetchRequest, connection: DbInConnection<string>,
 | `connection.options` | Options the client sent when it connected (validated with `optionsInput`). |
 | `session` | Server-side object to store state between fetches (must be JSON compatible). |
 
-Throw a `NoDataError` (or return `undefined`/`null`) when no more data is available.
+Throw a `NoDataError` (or return `undefined`) when no more data is available. Returning `null` is treated as regular content, so a Databox can express a state where the content legitimately is null.
 If the fetches are independent of each other, activate `parallelFetch` in the config.
 
 ### Data Structures

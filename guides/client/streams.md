@@ -10,20 +10,20 @@ Create a `WriteStream` and pass it inside the data of a request, transmit or dat
 import {WriteStream} from "zation-client";
 
 const stream = new WriteStream<true>(true); // binary stream
-stream.useWriter(async (write, end) => {
+(async () => {
     const reader = file.stream().getReader();
     while(true) {
         const {value, done} = await reader.read();
         if(done) break;
-        write(value.buffer);
+        await stream.write(value.buffer);
     }
-    end();
-});
+    await stream.end();
+})();
 
 const result = await client.request('files/upload', {
     fileName: file.name,
     file: stream
-});
+}, {processComplexTypes: true});
 ```
 
 For JSON chunks create the stream without the binary flag: `new WriteStream()`.

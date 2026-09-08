@@ -48,25 +48,37 @@ For JSON chunks, use a model instead of `'binary'`, e.g. `{chunks: {properties: 
 Create a `WriteStream` and return it inside the result (or pass it in a publish/transaction with `processComplexTypes: true`):
 
 ```typescript
-import {Controller, Socket, WriteStream} from "zation-server";
+import {Controller, Socket, WriteStream, ReturnsComplexData} from "zation-server";
 
 @Controller.Config({access: 'allAuth'})
 export default class DownloadReport extends Controller {
 
+    @ReturnsComplexData
     async handle(socket: Socket) {
         const stream = new WriteStream<true>(true); // true = binary stream
-        stream.useWriter(async (write, end) => {
-            for await (const chunk of readReportChunks()) write(chunk);
-            end();
-        });
+        (async () => {
+            for await (const chunk of readReportChunks()) await stream.write(chunk);
+            await stream.end();
+        })();
         return {report: stream};
     }
 
 }
 ```
 
-The `useWriter` callback receives `write(chunk)` and `end(lastChunk?)`. Writing waits automatically while the receiver's buffer is full.
+Mark the handle method with `@ReturnsComplexData` so that streams and binaries in the result are processed.
+`write(chunk)` resolves when the chunk was sent; it waits automatically until the receiver accepted the stream and while the receiver's buffer is full. `end(lastChunk?)` finishes the stream.
 `close(code)` aborts the stream with an error code. `closedSuccessfully` tells whether the stream ended without errors.
+
+Alternatively `useWriter(callback)` calls the callback once and again after every successful write, so the callback writes exactly one chunk per call:
+
+```typescript
+let i = 0;
+stream.useWriter((write, end) => {
+    if(i < chunks.length) write(chunks[i++]);
+    else end();
+});
+```
 
 ## Close Codes
 

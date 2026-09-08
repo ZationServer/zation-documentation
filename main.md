@@ -19,7 +19,7 @@ At the moment there is one client library for TypeScript/JavaScript (browser and
 The developer of the Zation framework is Luca Scaringella. 
 The framework will continuously be maintained and improved.
 
-> This documentation covers Zation 3. If you don't know how to implement something after reading it, look at the JSDoc of the Zation API in your IDE (every option and method is documented) or at the [integration tests](https://github.com/ZationServer/zation-integration-test). If this does not help, you can send me a message to <a href="mailto:info@zation.de">info@zation.de</a>.
+> This documentation covers Zation 3. If you don't know how to implement something after reading it, look at the JSDoc of the Zation API in your IDE (every option and method is documented) or at the [integration tests](https://github.com/ZationServer/zation-integration-test). If this does not help, open an issue in the [documentation repository](https://github.com/ZationServer/zation-documentation/issues).
 
 ## Donate
 

@@ -94,10 +94,12 @@ A `Block` can carry a code and a message that are sent to the client:
 import {Block} from "zation-server";
 
 socket: (socket) => {
-    if(isBanned(socket.remoteAddress)) throw new Block(4503, 'banned');
+    if(isBanned(socket.peerAddress)) throw new Block(4503, 'banned');
     if(maintenance) throw new Block(4403, 'maintenance');
 }
 ```
+
+`socket.peerAddress` (and `socket.peerPort`) is the TCP peer of the connection, never taken from a header. Behind a proxy it is the proxy; then `socket.forwardedFor` gives the raw `X-Forwarded-For` header, whose entries only count when the peer is a proxy you trust. `socket.remoteAddress` takes the first forwarded address as it is, which any client can write.
 
 The default block code is `4503`. Codes from `4500` upwards are permanent: the client does not try to reconnect automatically. Use a code below `4500` (e.g. `4403`) for temporary blocks, then the client keeps reconnecting with backoff.
 

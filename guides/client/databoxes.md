@@ -53,7 +53,7 @@ chat.onceDataChange().then(([data]) => {});
 
 `DataEventReason` tells why the event was triggered (fetch, insert, update, delete, reload, ...).
 
-The data is never changed in place: a change copies every object and array on its path, every other part keeps its identity. A reader can tell what changed by reference, and data handed out before keeps its content.
+The data is never changed in place: a change copies every object and array on its path, every other part keeps its identity. A reader can tell what changed by reference, and data handed out before keeps its content. Treat the data as read-only; `getDataClone()` returns a copy to change.
 
 ## Local Content
 

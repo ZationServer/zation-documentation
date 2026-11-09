@@ -38,3 +38,4 @@
    - [Streams](guides/client/streams.md)
    - [API Definition](guides/client/apiDefinition.md)
  - [Running In Production](guides/runningInProduction.md)
+ - [Release Notes](guides/releaseNotes.md)

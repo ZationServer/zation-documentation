@@ -86,7 +86,7 @@ protected memberMiddleware(member) {}  // return false or a Block to reject a me
 | `memberInput` | string | Model to validate the member. |
 | `maxSocketMembers` | `20` | Max members a socket can subscribe to in this channel. |
 | `unregisterDelay` | `120000` | Delay before an unused member is cleaned up. |
-| `batch` | `100` | Batch time in ms for outgoing packages (`null` to disable). |
+| `batch` | `0` | Bundling of outgoing packages: `0` bundles the publishes of one event loop turn and sends them at its end (no timer), a number above 0 waits up to that many ms, `null` sends each package directly. |
 
 The server config option `socketChannelLimit` limits the total number of channel subscriptions per socket.
 

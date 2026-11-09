@@ -53,6 +53,8 @@ chat.onceDataChange().then(([data]) => {});
 
 `DataEventReason` tells why the event was triggered (fetch, insert, update, delete, reload, ...).
 
+The data is never changed in place: a change copies every object and array on its path, every other part keeps its identity. A reader can tell what changed by reference, and data handed out before keeps its content.
+
 ## Local Content
 
 The local content API edits the data locally without contacting the server. It is useful for optimistic UI updates:
@@ -104,4 +106,11 @@ Custom strategies can be registered with `registerReloadStrategy(name, builder)`
 
 ## React
 
-The `zation-react-toolkit` package provides the hooks `useClient`, `useDatabox` and `useDataboxTracking` to use Databoxes in React components.
+The `zation-react-toolkit` package provides the hooks `useClient`, `useDatabox`, `useDataboxTracking` and `useDataboxSelector` to use Databoxes in React components.
+
+`useDataboxTracking` re-renders on every data change. `useDataboxSelector(databox, selector, isEqual)` (or `useDatabox(...).withSelector(selector, isEqual)`) re-renders only when the selected part changes; since every changed part is a new object, the default comparison by reference is enough. A selector that builds a new array or object needs an equality function such as `shallowEqual`:
+
+```typescript
+const [volume] = useDatabox('cinema').withSelector((data) => data?.volume);
+const [active] = useDatabox('devices').withSelector((data) => (data ?? []).filter((one) => one.active), shallowEqual);
+```

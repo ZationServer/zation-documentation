@@ -117,6 +117,17 @@ this.content(chatId, true)
 
 In a bundle, `partialUpdate({...})` updates only the given properties of an object.
 
+### Set the Whole Content
+
+`set` takes the whole new content and sends only what changed against the last value given to `set`, as one transaction:
+
+```typescript
+this.content().set({name: 'Cinema', volume: {level: 42}, modes});
+this.content(userId).set(profile);
+```
+
+Objects are compared key by key, arrays index by index (appended items become inserts, items removed from the end deletes) and key arrays key by key. Parts that are the same object as in the last value are skipped first, so treat a value given to `set` as immutable and keep unchanged parts as they are. The first `set` sends the value whole, an equal value sends nothing. A list of four or more items where most items changed, a reordered key array and a value of another kind go out whole. `set` is only available on the content head, not in a path or a bundle.
+
 ### Options
 
 Every operation accepts options:
@@ -185,7 +196,7 @@ protected onReceivedSignal(connection: DbInConnection<string>, signal: string, d
 | `reloadStrategy` | HistoryBased | Strategy the client uses to reload data after a reconnect. |
 | `unregisterDelay` | `120000` | Delay before an unused member is cleaned up. |
 | `fetchLastTransactionData` | `500` | Timeout to fetch the last transaction from other servers in a cluster. |
-| `batch` | `100` | Batch time in ms for outgoing packages (`null` to disable). |
+| `batch` | `0` | Bundling of outgoing packages: `0` bundles the packages of one event loop turn and sends them at its end (no timer), a number above 0 waits up to that many ms, `null` sends each package directly. |
 
 ## Using Databoxes in Other Components
 

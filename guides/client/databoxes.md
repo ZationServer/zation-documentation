@@ -104,6 +104,8 @@ After a reconnect, the Databox has to catch up on missed changes. The strategy i
 
 Custom strategies can be registered with `registerReloadStrategy(name, builder)`.
 
+Transactions of the server's `content().sync` name the transaction they were built on. When the Databox has another last transaction (another writer, a missed transaction), it does not apply them but reloads with the strategy and keeps its last data until the reload is done.
+
 ## React
 
 The `zation-react-toolkit` package provides the hooks `useClient`, `useDatabox`, `useDataboxTracking` and `useDataboxSelector` to use Databoxes in React components.

@@ -117,16 +117,21 @@ this.content(chatId, true)
 
 In a bundle, `partialUpdate({...})` updates only the given properties of an object.
 
-### Set the Whole Content
+### Sync the Whole Content
 
-`set` takes the whole new content and sends only what changed against the last value given to `set`, as one transaction:
+`sync` takes the whole current content. The Databox works out what changed and brings the clients there in one transaction:
 
 ```typescript
-this.content().set({name: 'Cinema', volume: {level: 42}, modes});
-this.content(userId).set(profile);
+// after updating the database
+this.content().sync({name: 'Cinema', volume: {level: 42}, modes});
+this.content(userId).sync(profile);
 ```
 
-Objects are compared key by key, arrays index by index (appended items become inserts, items removed from the end deletes) and key arrays key by key. Parts that are the same object as in the last value are skipped first, so treat a value given to `set` as immutable and keep unchanged parts as they are. The first `set` sends the value whole, an equal value sends nothing. A list of four or more items where most items changed, a reordered key array and a value of another kind go out whole. `set` is only available on the content head, not in a path or a bundle.
+The Databox instance keeps the last value given to `sync` in memory (per member, until its last client on this server has left; a server without clients of the member keeps it for good) and compares the next value with it: objects key by key, arrays index by index (appended items become inserts, items removed from the end deletes), key arrays key by key. Parts that are the same object as in the last value are skipped first, so treat a value given to `sync` as immutable and keep unchanged parts as they are. The first `sync` sends the value whole, an equal value sends nothing. A list of four or more items where most items changed, a reordered key array and a value of another kind go out whole. `sync` is only available on the content head, not in a path or a bundle. The fetch should return the same content.
+
+**Use one writer per Databox (member).** Every transaction of `sync` names the transaction it was built on. A client applies it only when that is its last transaction; otherwise it reloads instead and keeps its last data until the reload is done. A server that knows of another transaction since its last `sync` (from another server or instance, or a single operation) sends the value whole. So several writers cost a reload or a whole value, but they don't leave clients with wrong data. Only a client that loads while two servers write at the same moment can briefly show a mixed state, until the delayed transaction arrives and triggers a reload. The first `sync` of a server that knows no transaction of the member yet can make clients of other servers reload once. Older clients without the check apply the operations as before.
+
+Costs: the check adds about 0.01 µs per `sync` on the server, one comparison per transaction on the client and about 25 bytes per transaction. Comparing the values takes a few µs for a typical state. A conflict costs one reload per client.
 
 ### Options
 

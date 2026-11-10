@@ -1,7 +1,7 @@
 # Databox Protocol
 
 How a client Databox and a server Databox talk to each other, what changed with protocol version 1
-(zation-server 3.0.0-beta.3, zation-client 3.0.0-beta.2) and how old and new versions work together.
+(zation-server 3.0.0-beta.3, zation-client 3.0.0-beta.3) and how old and new versions work together.
 
 ## Messages
 

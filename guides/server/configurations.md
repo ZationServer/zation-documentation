@@ -58,6 +58,9 @@ The server config describes the technical settings of the server instance. Every
 | `validationCheckLimit` | `5` | Max checks in one validation request. |
 | `socketDataboxLimit` | `30` | Max Databoxes a socket can connect to. |
 | `socketChannelLimit` | `30` | Max Channels a socket can subscribe to. |
+| `databoxHistoryLength` | `100` | Default `historyLength` of the Databoxes, see [Databoxes](guides/server/databoxes.md#recommended-settings). |
+| `databoxHistorySize` | `65536` | Default `historySize` of the Databoxes in characters of JSON. |
+| `databoxHistoryBudget` | `67108864` | Maximum size of all Databox histories on the server in characters of JSON; over it, the history used longest ago is dropped. `null` sets no limit. |
 | `variables` | | Custom variables accessible with `bag.getServerConfigVariables()`. |
 | `log` | | Logging options (console, file, panel). |
 | `logComponentApi` | `true` | Log the complete component API at start. |

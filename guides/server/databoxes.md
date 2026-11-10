@@ -209,11 +209,41 @@ protected onReceivedSignal(connection: DbInConnection<string>, signal: string, d
 | `unregisterDelay` | `120000` | Delay before an unused member is cleaned up. |
 | `fetchLastTransactionData` | `500` | Timeout to fetch the last transaction from other servers in a cluster. |
 | `batch` | `0` | Bundling of outgoing packages: `0` bundles the packages of one event loop turn and sends them at its end (no timer), a number above 0 waits up to that many ms, `null` sends each package directly. |
-| `historyLength` | `100` | Last transactions the Databox (each member) keeps to resume clients after a lost connection; `0` keeps none. |
-| `historySize` | `65536` | Maximum size of these transactions in characters of JSON. |
+| `historyLength` | `100` (server config `databoxHistoryLength`) | Last transactions the Databox (each member) keeps to resume clients after a lost connection; `0` keeps none. |
+| `historySize` | `65536` (server config `databoxHistorySize`) | Maximum size of these transactions in characters of JSON. |
 
 A client that comes back after a lost connection gets the missed transactions while they are kept, otherwise the data, in one round trip.
 See [Databox Protocol](guides/databoxProtocol.md).
+
+### Recommended Settings
+
+Each registered Databox (each member of a Databox family) keeps its own history, up to `historySize`.
+The server config sets the defaults for all Databoxes (`databoxHistoryLength`, `databoxHistorySize`); the options of a Databox and the `databoxDefaults` of the app config take precedence.
+`databoxHistoryBudget` limits the sum of all histories on the server (default 64 Mi characters, `null` for no limit).
+Over it, the server drops the history that was used longest ago: a client that resumes there gets the data once, a client that was up to date resumes unchanged.
+No client gets outdated data.
+
+| Server | Settings |
+| --- | --- |
+| One server, few Databoxes and members | The defaults, or `databoxHistoryLength: 200` (`historyLength` on a Databox) for clients that are away longer. Memory does not matter. |
+| Many members | `databoxHistoryLength: 20`, `databoxHistorySize: 8192` and a `databoxHistoryBudget` that fits the memory of the server. |
+
+Example for 10,000 members:
+
+* With the defaults, each history can grow to 65536 characters: 655 M characters (about 625 MiB) at worst; the default budget stops at 64 Mi.
+* With `databoxHistorySize: 8192`: 82 M characters at worst. A typical transaction has 100 to 400 characters, so 20 transactions take about 4,000.
+* `databoxHistoryBudget: 16777216` (16 Mi characters) keeps the histories of the about 4,000 members used last (2,048 full ones). The clients of the others get the data when they resume after missed changes.
+
+A character of JSON takes one byte in memory (two in a transaction with characters outside Latin-1), plus about 30 bytes per transaction.
+The budget costs less than 0.02 µs per transaction.
+
+```typescript
+Config.serverConfig({
+    databoxHistoryLength: 20,
+    databoxHistorySize: 8192,
+    databoxHistoryBudget: 16 * 1024 * 1024
+}).register();
+```
 
 ## Using Databoxes in Other Components
 

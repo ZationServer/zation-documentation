@@ -29,6 +29,8 @@
 * The first data comes with the connect response: one round trip instead of two.
 * After a lost connection, a Databox tells the server where its data stands. The server answers in one round trip with unchanged, the missed transactions or the data. Before, a change while away cost four round trips until the data.
 * Servers keep the last transactions of each Databox (member) for this: `historyLength` (default `100`) and `historySize` (default `65536` characters).
+* `databoxHistoryLength` and `databoxHistorySize` in the server config set these defaults for all Databoxes; the options of a Databox and `databoxDefaults` take precedence.
+* `databoxHistoryBudget` in the server config limits all histories of a server (default 64 Mi characters, `null` for no limit). Over it, the history used longest ago is dropped: a client that resumes there gets the data once. See [Recommended Settings](guides/server/databoxes.md#recommended-settings).
 * Where the server can not tell, or with an older server, the reload sends the session reset together with its fetches and shows the data without waiting for the session copy: two round trips instead of four.
 * The connect requests of all Databoxes after a reconnect go out as one message.
 * Every combination of old and new clients and servers works; see [Databox Protocol](guides/databoxProtocol.md).

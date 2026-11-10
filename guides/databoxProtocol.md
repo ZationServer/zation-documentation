@@ -67,6 +67,8 @@ Servers send `n` to every client; older clients ignore it.
 Each registered Databox (each member of a Databox family) keeps a history: its last transactions in the order this server processed them, its own and those of other servers (via the broker), as JSON.
 The configuration options `historyLength` (default `100`, `0` keeps none) and `historySize` (default `65536` characters) limit it.
 Forced reloads and transactions with complex types take a position without an entry.
+The server config sets their defaults and `databoxHistoryBudget`, the limit of all histories on the server: over it, the server drops the entries of the history that was used (written or replayed) longest ago.
+A dropped history keeps its position. When it held a position without an entry (a forced reload), the newest position becomes one, so no client of another server resumes across the reload.
 
 A connect request with `v`:
 
@@ -111,9 +113,9 @@ In a cluster with old and new servers, a client can move between them: on an old
 ### Edge Cases
 
 * **Another server:** the history id differs, so the client resumes only by its last transaction id and the same chain heads (unchanged) or gets the data.
-* **Expired history:** more transactions than `historyLength`, more than `historySize`, or the Databox unregistered after `unregisterDelay` without clients: the client gets the data.
+* **Expired history:** more transactions than `historyLength`, more than `historySize`, the budget of the server dropped the history, or the Databox unregistered after `unregisterDelay` without clients: the client gets the data. A client at the newest position of a dropped history resumes unchanged.
 * **Changes during the resume:** the response covers everything up to `n`, later changes come as packages; nothing is applied twice.
-* **Forced reloads:** a client that comes back to the server gets the data. On another server, too, while the reload is in its history. As before, `forceReload` only reaches connected clients for sure; use `anyContentChange` for changes everyone has to get.
+* **Forced reloads:** a client that comes back to the server gets the data. On another server, too, while the reload is in its history (also when the budget dropped the history). As before, `forceReload` only reaches connected clients for sure; use `anyContentChange` for changes everyone has to get.
 * **`content().sync`:** missed synced transactions come in order like any other.
 
 ## Cluster: Missed Transactions

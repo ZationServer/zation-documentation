@@ -1,5 +1,12 @@
 # Release Notes
 
+## zation-client 3.0.0-beta.4, zation-server 3.0.0-beta.4, zation-assured 3.0.0-beta.4, zation 3.0.0-beta.4
+
+* Browser bundlers (Vite, webpack, Rollup, esbuild) load the client without a plugin and without a `define`. The bundle requires its dependencies by their literal names (`ziron-client`, `queric`, `emitix`) and uses `globalThis` instead of `global`. Before, the obfuscator turned some of these names into computed calls (`require(_0x…)`), which no bundler follows, and the UMD wrapper used the node only `global`.
+* A plugin that patched these calls and `define: {global: 'globalThis'}` for the client are no longer needed.
+* The code stays obfuscated as before. Each build checks the bundle: literal requires of the dependencies only, no `global`, no plain local name, no source map, only `dist` with the declarations in the package.
+* zation-server and zation (CLI) only take the new version, zation-assured also `zation-client` 3.0.0-beta.4. The templates of the CLI use 3.0.0-beta.4. zation-state and zation-broker stay 8.0.0-beta.2. zation-react-toolkit 1.8.1 takes this client (`^3.0.0-beta.3`).
+
 ## zation-react-toolkit 1.8.1
 
 * `useDatabox` takes `enabled` in its options: with `false` the component does not connect the Databox, for data that is only wanted after a login or while a part is open. Switching it to `true` connects it.

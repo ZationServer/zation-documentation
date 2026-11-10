@@ -151,7 +151,7 @@ Clients with a transaction middleware get transactions without `k` and `q`: they
 
 ### Client
 
-A client follows the chains from the heads of its fetched data (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A transaction the heads hold already is applied as usual (the fetch response can overtake it on the socket; its timestamp is not newer than the data). A reload or data from the connect response starts the chains anew. With the heads of its data, a client that comes back on another server resumes there when nothing changed.
+A client follows the chains from the heads of its fetched data (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads. A transaction the heads hold already is applied as usual (the fetch response can overtake it on the socket; its timestamp is not newer than the data). A reload or data from the connect response starts the chains anew. With the heads of its data, a client that comes back on another server resumes there when nothing changed.
 A delete of a key the client does not have keeps its timestamp: an older set of another server that comes later does not bring the key back.
 Fetched data has at least the timestamp of the newest transaction the server saw for the Databox (member), so an older transaction that comes later does not override it. See [Several Writers](#several-writers-contentsync) for when it has exactly that timestamp.
 
@@ -198,7 +198,7 @@ A new member asks the other servers for the last transaction data once more when
 ### Compatibility
 
 * Older clients apply the transactions as before (they ignore the fraction).
-* The base `b` of `content().sync` transactions (only in unreleased builds before this) is gone; current clients still reload when one does not fit.
+* The base `b` of `content().sync` transactions (only in unreleased builds before this) is gone from servers and clients.
 * Servers without the shadow do not notice conflicts; servers without the clock stamp with their own clock.
 * Given `timestamp`s must not run behind the clock of any server: fetched data of a server whose clock runs ahead rejects them until they pass it.
 

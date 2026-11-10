@@ -24,7 +24,7 @@
 
 ### Databox Transactions
 
-* A transaction is converted to JSON once for the history and the clients (without complex types and a transaction middleware). With the history and the other small changes, a transaction takes about 0.6 µs on the server that receives it from another server instead of 1.2 µs, and 1.4 µs on the server that emits it instead of 2.1 µs.
+* A transaction is converted to JSON once for the other servers, the history and the clients (without complex types; a transaction middleware gets objects). With the history and the other small changes, a transaction takes about 0.6 µs on the server that receives it from another server instead of 1.2 µs, and 1.0 µs on the server that emits it instead of 2.1 µs.
 
 ### React
 
@@ -58,6 +58,7 @@
 * The channel exchange tells whether a subscription at the broker is active (`isSubscriptionActive`), when it becomes active or is cut (`onSubscriptionChange`) and about publishes that may not have reached the broker (`onPublishLoss`).
 * The broker pool repeats a subscribe that a lost connection cut; before, the server missed the channel until it subscribed again. A channel that moves to another broker stays subscribed at the old one for 5 s.
 * The state server tells the workers when a worker leaves (`workerLeave`).
+* The channel exchange publishes a `JSONString` (prepared JSON, without complex types) without converting it again: the other servers and the sockets get the same message as from the value, the listeners of the server itself the `JSONString`.
 
 ### Connection
 

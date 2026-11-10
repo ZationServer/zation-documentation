@@ -1,6 +1,6 @@
 # Release Notes
 
-## zation-server 3.0.0-beta.3, zation-client 3.0.0-beta.2, zation-react-toolkit 1.8.0
+## zation-server 3.0.0-beta.3, zation-client 3.0.0-beta.3, zation-react-toolkit 1.8.0
 
 ### Batching
 
@@ -30,6 +30,10 @@
 
 * `useDataboxSelector(databox, selector, isEqual)` and `useDatabox(...).withSelector(selector, isEqual)` re-render only when the selected part changes.
 * `shallowEqual` for selectors that build a new array or object.
+* `useDatabox` shares one Databox and its connection between the components with the same client, identifier, member and options, and disconnects it 3 s after the last of them unmounted. Before, each component connected its own, and a route change or the strict mode of React connected again.
+* `useConnected`, `useAuthenticated` and `useAuthTokenPayload` re-render on the connection and token events of the client.
+* `useRequest(request, isEnabled)` sends a request once and again with `reload`, with `data` and `error`.
+* See [React](guides/client/react.md).
 
 ### Databox Connect and Resume (protocol version 1)
 
@@ -68,8 +72,9 @@
 
 1. `ziron-engine` 2.6.0
 2. `ziron-server` and `ziron-client` 9.12.0 (with `ziron-engine` 2.6.0), then `ziron-worker`, `ziron-broker` and `ziron-state` 9.12.0 (`ziron-worker` with the broker signals and `workerLeave`, `ziron-state` with `workerLeave`)
-3. `zation-server` 3.0.0-beta.3 (`ziron-worker` 9.12.0) and `zation-client` 3.0.0-beta.2 (`ziron-client` 9.12.0) together; `zation-state` and `zation-broker` with `ziron-state` and `ziron-broker` 9.12.0
-4. `zation-react-toolkit` 1.8.0 (peer `zation-client` ^3.0.0-beta.2)
+3. `zation-server` 3.0.0-beta.3 (`ziron-worker` 9.12.0) and `zation-client` 3.0.0-beta.3 (`ziron-client` 9.12.0) together; `zation-state` and `zation-broker` 8.0.0-beta.2 with `ziron-state` and `ziron-broker` 9.12.0; `zation-assured` 3.0.0-beta.3
+4. `zation` (CLI) 3.0.0-beta.3: new projects start with these versions
+5. `zation-react-toolkit` 1.8.0 (peer `zation-client` 3.0.0-beta.3)
 
 With an older `ziron-engine`, `batch: 0` sends each package directly.
 zation-server and zation-client can be published in either order for the Databox protocol: each works with the older version of the other.

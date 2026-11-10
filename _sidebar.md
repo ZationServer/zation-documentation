@@ -37,6 +37,7 @@
    - [Events](guides/client/events.md)
    - [Streams](guides/client/streams.md)
    - [API Definition](guides/client/apiDefinition.md)
+   - [React](guides/client/react.md)
  - [Databox Protocol](guides/databoxProtocol.md)
  - [Running In Production](guides/runningInProduction.md)
  - [Release Notes](guides/releaseNotes.md)

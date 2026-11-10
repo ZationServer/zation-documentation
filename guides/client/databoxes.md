@@ -110,7 +110,7 @@ Each transaction carries its position in the chain of its server. When the Datab
 
 ## React
 
-The `zation-react-toolkit` package provides the hooks `useClient`, `useDatabox`, `useDataboxTracking` and `useDataboxSelector` to use Databoxes in React components.
+The `zation-react-toolkit` package provides the hooks `useDatabox`, `useDataboxTracking` and `useDataboxSelector` to use Databoxes in React components (see [React](guides/client/react.md)). Components that use the same Databox share one connection.
 
 `useDataboxTracking` re-renders on every data change. `useDataboxSelector(databox, selector, isEqual)` (or `useDatabox(...).withSelector(selector, isEqual)`) re-renders only when the selected part changes; since every changed part is a new object, the default comparison by reference is enough. A selector that builds a new array or object needs an equality function such as `shallowEqual`:
 

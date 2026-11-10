@@ -36,7 +36,7 @@ New fields:
 | --- | --- | --- |
 | `v` | `1` | Protocol version of the client. Older servers ignore it. |
 | `f` | `{i?}` | Fetch with the input `i` during the connect and send the data with the response. First contact: the `autoFetchData` (only with `autoFetch`). Reconnect: the input of the only fetch when one fetch (counter 0) loaded the data and the reload strategy is `HistoryBased`. |
-| `r` | `{h?, n?, i}` | Reconnect only, with the token: where the data of the client stands. History id `h` and position `n` it got last from that server, last transaction id `i`. Not sent while a reload runs or after a reload failed. |
+| `r` | `{h?, n?, i, c?}` | Reconnect only, with the token: where the data of the client stands. History id `h` and position `n` it got last from that server, last transaction id `i`, chain heads `c` (`[k, q]` since its data was loaded). Not sent while a reload runs or after a reload failed. |
 
 ### Connect Response
 
@@ -73,7 +73,7 @@ A connect request with `v`:
 1. Checks access, token and options as before.
 2. Finds where the client stands (the base):
     * With the id of this history: the position `n` when every transaction after it is kept and can be replayed. With a transaction middleware only when nothing came after it, because each missed transaction would need the middleware for this socket.
-    * With another id (another server, another registration): the newest position when `i` is the last transaction id and no kept entry is a reload. That is the check of version 0.
+    * With another id (another server, another registration): the newest position when `i` is the last transaction id, no kept entry is a reload and the chain heads `c` are the same as the ones of the server. The transactions of several servers come in another order on each server: the last transaction id alone does not tell that the client has every older one.
 3. Without a base and with `f`: fetches on a new main session (counter 0) before the socket joins. The base is the position when the fetch started. Errors give no data: the client fetches by itself and gets the error then.
 4. Registers the socket. In the same turn, it adds `h`, `n`, `r` and the transactions after the base (`tx`). When the Databox registered again meanwhile, or a transaction after the base can not be replayed, `r` stays empty.
 5. Only when the data goes out, the input channel takes the new main session.
@@ -110,7 +110,7 @@ In a cluster with old and new servers, a client can move between them: on an old
 
 ### Edge Cases
 
-* **Another server:** the history id differs, so the client resumes only by its last transaction id (unchanged) or gets the data.
+* **Another server:** the history id differs, so the client resumes only by its last transaction id and the same chain heads (unchanged) or gets the data.
 * **Expired history:** more transactions than `historyLength`, more than `historySize`, or the Databox unregistered after `unregisterDelay` without clients: the client gets the data.
 * **Changes during the resume:** the response covers everything up to `n`, later changes come as packages; nothing is applied twice.
 * **Forced reloads:** a client that comes back to the server gets the data. On another server, too, while the reload is in its history. As before, `forceReload` only reaches connected clients for sure; use `anyContentChange` for changes everyone has to get.
@@ -152,6 +152,7 @@ Clients with a transaction middleware get transactions without `k` and `q`: they
 
 A client follows the chains since its data was loaded (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A reload or data from the connect response starts the chains anew.
 A delete of a key the client does not have keeps its timestamp: an older set of another server that comes later does not bring the key back.
+Fetched data has at least the timestamp of the newest transaction the server saw for the Databox (member), so an older transaction that comes later does not override it.
 
 ### Compatibility
 

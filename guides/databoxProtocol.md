@@ -84,7 +84,7 @@ Every package after the response has a position above `n`. A package with a posi
 
 * Sends `v`, `f` and `r` as described. The connect requests of one microtask round (all Databoxes after a reconnect) go out as one message.
 * While its request is on its way, the Databox holds the packages of its output channel (another Databox on the socket may have connected already).
-* `r: 0`: nothing to do. `r: 1`: applies `tx` in order, with the base check of `content().sync`. `r: 2`: takes `f` (first contact like a fetch, reconnect like a reload) and applies `tx` on it; a transaction of unknown content in `tx` starts a reload.
+* `r: 0`: nothing to do. `r: 1`: applies `tx` in order. `r: 2`: takes `f` (first contact like a fetch, reconnect like a reload) and applies `tx` on it; a transaction of unknown content in `tx` starts a reload.
 * Takes `n` as its position: held and later packages up to `n` are skipped.
 * Without `r` from a server of version 1: fetches (first contact) or reloads (reconnect).
 * Without `v` (older server): works like version 0 and forgets the position.
@@ -114,7 +114,7 @@ In a cluster with old and new servers, a client can move between them: on an old
 * **Expired history:** more transactions than `historyLength`, more than `historySize`, or the Databox unregistered after `unregisterDelay` without clients: the client gets the data.
 * **Changes during the resume:** the response covers everything up to `n`, later changes come as packages; nothing is applied twice.
 * **Forced reloads:** a client that comes back to the server gets the data. On another server, too, while the reload is in its history. As before, `forceReload` only reaches connected clients for sure; use `anyContentChange` for changes everyone has to get.
-* **`content().sync`:** missed synced transactions come in order, so each fits its base.
+* **`content().sync`:** missed synced transactions come in order like any other.
 
 ## Cluster: Missed Transactions
 
@@ -124,7 +124,7 @@ Servers pass transactions to each other over the broker. Before zation-server 3.
 
 A client never keeps wrong data: when a transaction may be missing, its server (or the client itself) reloads the data from the source. In between, data can be out of date. A server, after its broker connection was cut, answers resumes with the data until its subscription is active again.
 
-What it takes from the application: write the source before emitting, as before. Changes of the same key from several servers need timestamps in the order of the source (`timestamp` option) and the forms that do not depend on the order: `update` with `potentialInsert`, `insert` with `potentialUpdate`, and `delete`. A plain `insert`/`update` of a missing key, `if` conditions and list indexes depend on the order in which the transactions come; for those, use one writer per Databox (member) or `content().sync`.
+What it takes from the application: write the source before emitting, as before. Changes of the same key from several servers need `content().sync`, or timestamps in the order of the source (`timestamp` option) and the forms that do not depend on the order: `update` with `potentialInsert`, `insert` with `potentialUpdate`, and `delete`. A plain `insert`/`update` of a missing key, `if` conditions and list indexes depend on the order in which the transactions come; for those, use one writer per Databox (member).
 
 ### How a Server Notices
 
@@ -153,7 +153,7 @@ Clients with a transaction middleware get transactions without `k` and `q`: they
 
 A client follows the chains from the heads of its fetched data (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A transaction the heads hold already is applied as usual (the fetch response can overtake it on the socket; its timestamp is not newer than the data). A reload or data from the connect response starts the chains anew. With the heads of its data, a client that comes back on another server resumes there when nothing changed.
 A delete of a key the client does not have keeps its timestamp: an older set of another server that comes later does not bring the key back.
-Fetched data has at least the timestamp of the newest transaction the server saw for the Databox (member), so an older transaction that comes later does not override it.
+Fetched data has at least the timestamp of the newest transaction the server saw for the Databox (member), so an older transaction that comes later does not override it. See [Several Writers](#several-writers-contentsync) for when it has exactly that timestamp.
 
 ### Compatibility
 
@@ -171,3 +171,41 @@ Fetched data has at least the timestamp of the newest transaction the server saw
 | Memory | up to 64 followed chains per member (server and client), up to 10000 own chains per Databox |
 | Reloads | a cut subscription, a lost publish or a server that left reloads the clients of the members concerned (on a server that left: every member of the other servers) |
 
+## Several Writers (content().sync)
+
+Since zation-server 3.0.0-beta.3, several servers can `sync` the same Databox (member); see [Sync the Whole Content](guides/server/databoxes.md#sync-the-whole-content).
+
+### Timestamps
+
+A transaction without a given `timestamp` takes `max(now + lead, floor(newest) + 1) + rank`: `newest` is the newest timestamp the Databox saw on this server (its own transactions, those of other servers, the last transaction data of other servers), `rank` a fraction of a millisecond in 1000 steps from the random origin of the server process. `lead` is how far the clocks of other servers run ahead of this one: a server sends its clock (`Date.now()`) with each transaction to the other servers (third element of the server package) and with its answer to the last transaction data request of a new member (fourth element; older servers ignore both), and the largest lead of the current and the last 30 s counts (per process, up to 60 s). The latency only makes it smaller; timestamps of transactions do not count, since they can run ahead of a clock. A transaction of unknown content (`anyContentChange`) takes `now + lead` without the rank, as it orders nothing. Timestamps of one server only grow; a server whose clock runs behind takes newer ones once it saw a transaction of a server whose clock runs ahead; two servers never take the same one (the same rank of two servers is a chance of one in a thousand). Many transactions in one millisecond move the timestamps ahead of the clock.
+
+### Shadow
+
+Each server keeps, per registered member, the content as its clients hold it: objects key by key with the timestamp of each key, a deleted key keeps its timestamp, every other value whole. It applies its own and the other servers' transactions with the rules of the client. `sync(next)` compares `next` with it and sends updates with `potentialInsert` and deletes, no base (`b`). Without a shadow (first `sync` of the server, after a reload, a reset, a cut subscription or a close) the value goes whole: an update of the head with `potentialInsert`. While the subscription is not active, every `sync` goes whole and no shadow is kept. `sync` on a member without clients registers it (subscription) until `unregisterDelay` after the last `sync`.
+
+A transaction the shadow can not follow (if conditions, queries, a path into a list, unknown content) drops it.
+
+### Conflict
+
+An update with `potentialInsert`, an `insert` with `potentialUpdate` or a `delete` of another server conflicts when it does not take (an older timestamp, a missing parent, a deleted key) and its value differs from the shadow, or when it takes and removes a newer change inside with another value. The source holds the change that was written last; the timestamps can not tell which one that is. The server resets the member (its clients reload, the history takes a position, the last transaction id becomes unknown) and sends a gap notice (`g`): the other servers reset it too.
+
+### Fetch Timestamp
+
+Fetched data takes `max(now + lead, newest)`: never older than a transaction the server saw, and not behind the clocks of the other servers, so a transaction that comes late (a broker connection that was down sends its buffer when it is back) does not override newer data. The newest timestamp of fetched data per member is kept: a transaction of another server that is older than it and still takes in the shadow (the clients that loaded rejected it, the data may not hold it) makes the clients of this server reload. With clocks seconds apart this happens until the server whose clock runs behind saw a transaction of the one that runs ahead.
+
+### Compatibility
+
+* Older clients apply the transactions as before (they ignore the fraction).
+* The base `b` of `content().sync` transactions (only in unreleased builds before this) is gone; current clients still reload when one does not fit.
+* Servers without the shadow do not notice conflicts; servers without the clock stamp with their own clock.
+* Given `timestamp`s must not run behind the clock of any server: fetched data of a server whose clock runs ahead rejects them until they pass it.
+
+### Cost
+
+| What | Cost |
+| --- | --- |
+| Memory | about ten times the content as JSON per synced member and server (4.4 KB for 415 bytes with 35 keys) |
+| `sync` | about 1 µs with one changed key in an unchanged object tree, about 6 µs for a freshly read value |
+| Transaction of another server | about 0.3 µs (one key), 4.5 µs (whole value of that size) |
+| Bytes | one changed key about 45 bytes of operations instead of 440 bytes whole; the timestamp fraction four bytes to clients; the clock of the sender 14 bytes per transaction between servers |
+| Conflict | one reload per client of the member on every server |

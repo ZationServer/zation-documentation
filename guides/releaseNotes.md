@@ -9,9 +9,10 @@
 
 ### Databox `content().sync`
 
-* `content().sync(value)` and `content(member).sync(value)` take the whole content and send only what changed since the last synced value, as one transaction.
-* Each of these transactions names the transaction it was built on. A client with another last transaction reloads instead of applying it.
-* Use one writer per Databox (member). Several writers cost reloads.
+* `content().sync(value)` and `content(member).sync(value)` take the whole content and send only what changed, as one transaction: objects key by key, other values whole. It is the recommended way to change a Databox; the other operations stay.
+* Several servers can sync the same Databox (member). Each server compares with the content as the clients hold it (its shadow, with the timestamp of every key) and takes the changes of the others; per key the newer timestamp wins on every client.
+* Transactions without a `timestamp` take one newer than every transaction the server has seen and not behind the clocks of the other servers, with the rank of the server as the fraction of a millisecond: a server whose clock runs behind does not lose its later changes. Servers send their clock with each transaction to the other servers for this; fetched data takes the same time.
+* Two servers that set the same key at the same moment to different values make the clients of every server reload from the database.
 
 ### Client Data
 

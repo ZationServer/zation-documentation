@@ -119,19 +119,26 @@ In a bundle, `partialUpdate({...})` updates only the given properties of an obje
 
 ### Sync the Whole Content
 
-`sync` takes the whole current content. The Databox works out what changed and brings the clients there in one transaction:
+`sync` is the recommended way to change a Databox: after updating the database, read the content and give it to `sync`. The Databox works out what changed and brings the clients there in one transaction. The other operations above stay for cases that need them.
 
 ```typescript
 // after updating the database
 this.content().sync({name: 'Cinema', volume: {level: 42}, modes});
-this.content(userId).sync(profile);
+this.content(userId).sync(await loadProfile(userId));
 ```
 
-The Databox instance keeps the last value given to `sync` in memory (per member, until its last client on this server has left; a server without clients of the member keeps it for good) and compares the next value with it: objects key by key, arrays index by index (appended items become inserts, items removed from the end deletes), key arrays key by key. Parts that are the same object as in the last value are skipped first, so treat a value given to `sync` as immutable and keep unchanged parts as they are. The first `sync` sends the value whole, an equal value sends nothing. A list of four or more items where most items changed, a reordered key array and a value of another kind go out whole. `sync` is only available on the content head, not in a path or a bundle. The fetch should return the same content.
+Each server keeps the content as the clients hold it (the shadow, per member): every key with the timestamp of its last change, deleted keys with the timestamp of the delete. It takes the transactions of all servers as they come and compares the next value with it: objects key by key (a changed or new key goes out as an update that inserts a missing key, a removed key as a delete), every other value whole (arrays, key arrays, a value of another kind). Parts that are the same object as in the last value are skipped first, so treat a value given to `sync` as immutable and keep unchanged parts as they are. An equal value sends nothing. The first `sync` of a server for a member sends the value whole, and so does the first one after a reload of its clients. `sync` is only available on the content head, not in a path or a bundle. The fetch should return the same content.
 
-**Use one writer per Databox (member).** Every transaction of `sync` names the transaction it was built on. A client applies it only when that is its last transaction; otherwise it reloads instead and keeps its last data until the reload is done. A server that knows of another transaction since its last `sync` (from another server or instance, or a single operation) sends the value whole. So several writers cost a reload or a whole value, but they don't leave clients with wrong data. Only a client that loads while two servers write at the same moment can briefly show a mixed state, until the delayed transaction arrives and triggers a reload. The first `sync` of a server that knows no transaction of the member yet can make clients of other servers reload once. Older clients without the check apply the operations as before.
+**Several writers.** Any server can `sync` the same Databox (member). Per key, the change with the newer timestamp wins on every client, in whatever order the transactions come:
 
-Costs: the check adds about 0.01 µs per `sync` on the server, one comparison per transaction on the client and about 25 bytes per transaction. Comparing the values takes a few µs for a typical state. A conflict costs one reload per client.
+* A `sync` without a `timestamp` takes a timestamp newer than every transaction its server has seen and not behind the clocks of the other servers (a hybrid logical clock), so a change after one of another server wins also when that server's clock runs ahead. The rank of the server is the fraction of a millisecond: two servers never take the same timestamp.
+* A change of another server that is still on its way when a server syncs: when the read value has it, the server sends it with its newer timestamp and the older transaction changes nothing; when the value does not have it, the server leaves the key alone and the change takes when it arrives.
+* When two servers change the same key at the same moment to different values, the database holds the one that was written last, which the timestamps can not tell. The server of the newer transaction notices the older one when it comes in; then the clients of every server reload from the database. The same happens when a change would remove a newer one inside it.
+* A server that writes a member without clients of it follows the member while it writes (`unregisterDelay` after its last `sync`), so it knows the changes of the others.
+
+Read the content right before the `sync`: a value read before a change of another server reached this server sets the older values again (with a newer timestamp) until the next `sync` of the key.
+
+Costs: the shadow takes about ten times the size of the content as JSON in memory (4.4 KB for a 415-byte state with 35 keys). A `sync` with one changed key takes about 1 µs for an unchanged object tree, about 6 µs for a freshly read value; a transaction of another server takes about 0.3 µs. One changed key sends about 45 bytes of operations instead of 440 bytes of the whole value; the timestamp adds four bytes. A conflict costs one reload per client.
 
 ### Options
 

@@ -11,7 +11,7 @@ Without a client, the hooks use the primary client.
 | Hook | Returns |
 | --- | --- |
 | `useClient()` | The primary client. |
-| `useDatabox(client?, identifier, member?, options?)` | The connected Databox, with `withTracking()` and `withSelector(selector, isEqual?)`. |
+| `useDatabox(client?, identifier, member?, options?)` | The connected Databox, with `withTracking()` and `withSelector(selector, isEqual?)`. `options.enabled: false` does not connect it. |
 | `useDataboxTracking(databox)` | The data; re-renders on every change. |
 | `useDataboxSelector(databox, selector, isEqual?)` | The selected part; re-renders only when it changes. |
 | `useConnected(client?)` | Whether the client is connected. |
@@ -30,6 +30,12 @@ const [room] = useDatabox('room', roomId).withTracking();
 ```
 
 Since every changed part of the data is a new object, the default comparison of a selector by reference is enough. A selector that builds a new array or object needs an equality function such as `shallowEqual`. See [Databoxes](guides/client/databoxes.md#react).
+
+A hook can not be called conditionally. For data that is only wanted after a login or while a part is open, `enabled: false` keeps the component from connecting the Databox; switching it to `true` connects it. The data is the one of the shared Databox, so it is `undefined` unless another component connected it. `enabled` is not part of the options the components share by.
+
+```ts
+const [identity] = useDatabox('identity', undefined, {enabled: loggedIn}).withTracking();
+```
 
 ## Connection and Authentication
 

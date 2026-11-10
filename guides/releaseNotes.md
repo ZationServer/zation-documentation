@@ -1,5 +1,10 @@
 # Release Notes
 
+## zation-react-toolkit 1.8.1
+
+* `useDatabox` takes `enabled` in its options: with `false` the component does not connect the Databox, for data that is only wanted after a login or while a part is open. Switching it to `true` connects it.
+* The peer dependency is `zation-client` `^3.0.0-beta.3` instead of exactly `3.0.0-beta.3`, so a newer client does not need a new toolkit.
+
 ## zation-server 3.0.0-beta.3, zation-client 3.0.0-beta.3, zation-react-toolkit 1.8.0
 
 ### Batching

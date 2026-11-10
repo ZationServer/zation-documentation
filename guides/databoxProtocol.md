@@ -48,7 +48,7 @@ New fields, only when the request has `v`:
 | `h` | string | Id of the history of the Databox (member) on this server. It is new with every registration. |
 | `n` | number | The position in the history that the response brings the client to. |
 | `r` | `0`, `1`, `2` or missing | `0` unchanged; `1` the missed transactions are in `tx`; `2` the data is in `f`, followed by the transactions in `tx`. Missing: the client fetches (first contact) or reloads (reconnect) by itself. |
-| `f` | `{c, d, t, ti}` | The fetched data like a fetch response: counter, data, new token, timestamp. |
+| `f` | `{c, d, t, ti, k}` | The fetched data like a fetch response: counter, data, new token, timestamp, chain heads. |
 | `tx` | transactions | With `r: 1` the missed transactions, with `r: 2` the transactions that came during the fetch. |
 
 `lt` stays the last transaction id the server knows.
@@ -73,7 +73,7 @@ A connect request with `v`:
 1. Checks access, token and options as before.
 2. Finds where the client stands (the base):
     * With the id of this history: the position `n` when every transaction after it is kept and can be replayed. With a transaction middleware only when nothing came after it, because each missed transaction would need the middleware for this socket.
-    * With another id (another server, another registration): the newest position when `i` is the last transaction id, no kept entry is a reload and the chain heads `c` are the same as the ones of the server. The transactions of several servers come in another order on each server: the last transaction id alone does not tell that the client has every older one.
+    * With another id (another server, another registration): the newest position when `i` is the last transaction id, no kept entry is a reload and the chain heads `c` are the same as the ones of the server (the chains it follows and its own). The transactions of several servers come in another order on each server: the last transaction id alone does not tell that the client has every older one.
 3. Without a base and with `f`: fetches on a new main session (counter 0) before the socket joins. The base is the position when the fetch started. Errors give no data: the client fetches by itself and gets the error then.
 4. Registers the socket. In the same turn, it adds `h`, `n`, `r` and the transactions after the base (`tx`). When the Databox registered again meanwhile, or a transaction after the base can not be replayed, `r` stays empty.
 5. Only when the data goes out, the input channel takes the new main session.
@@ -145,12 +145,13 @@ ziron confirms the publishes of a broker connection with one acknowledged publis
 | `k` | transaction (between servers and to clients) | The chain: the transactions of one server for this Databox (member). A server keeps 10000 chains per Databox; a member that comes back after that starts a new chain. |
 | `q` | transaction | Position in the chain. The next transaction of the chain has `q + 1`. |
 | `g` | reload package of a broadcast (between servers only) | Gap notice with the chain head `[k, q]` of the sending server (or `1`). The receiving servers send their clients a plain reload. |
+| `k` | fetch response (also `f` of the connect response) | The chain heads `[k, q]` the data holds: the chains the server follows and its own, taken when the fetch starts. |
 
 Clients with a transaction middleware get transactions without `k` and `q`: they do not get every transaction of a chain.
 
 ### Client
 
-A client follows the chains since its data was loaded (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A reload or data from the connect response starts the chains anew.
+A client follows the chains from the heads of its fetched data (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A transaction the heads hold already is applied as usual (the fetch response can overtake it on the socket; its timestamp is not newer than the data). A reload or data from the connect response starts the chains anew. With the heads of its data, a client that comes back on another server resumes there when nothing changed.
 A delete of a key the client does not have keeps its timestamp: an older set of another server that comes later does not bring the key back.
 Fetched data has at least the timestamp of the newest transaction the server saw for the Databox (member), so an older transaction that comes later does not override it.
 
@@ -159,6 +160,7 @@ Fetched data has at least the timestamp of the newest transaction the server saw
 * Older clients ignore `k` and `q`. Older servers pass `k` and `q` on to their clients: a new client then notices a gap they did not (with a transaction middleware on such a server, it reloads more often than needed).
 * Older servers take a gap notice as a forced reload of their clients.
 * Without ziron 9.12.0 (ziron-worker, ziron-server, ziron-state) the signals are missing; the chain still catches a gap between two transactions of a server.
+* Clients of version 0 (before 3.0.0-beta.2) send no resume point: after a reconnect they keep their data when the `lt` of the connect response is their last transaction id. On another server this can hide an older transaction of a third server that came there after it. This was the case before; the chains of new servers do not change it, updated clients do.
 
 ### Cost
 

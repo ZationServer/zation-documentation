@@ -39,6 +39,7 @@
 * Each transaction carries its chain (`k`, `q`): the transactions of one server for a Databox (member). A server or client that sees a position skipped reloads instead of applying it.
 * While its subscription at the broker is cut, a server answers resumes with the data; when it is active again, its clients reload. A new member waits up to 1 s for its subscription.
 * A server whose publishes may not have reached the broker sends a gap notice; when a server leaves the cluster, the others reload the clients of all their members.
+* Fetched data carries the chain heads it holds, so a client that comes back on another server resumes there when nothing changed.
 * A delete of a key the client does not have keeps its timestamp, so an older set of another server that comes later does not bring the key back.
 * See [Databox Protocol](guides/databoxProtocol.md#cluster-missed-transactions) for the fields, what the application has to do and the cost.
 

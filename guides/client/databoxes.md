@@ -11,8 +11,10 @@ await profile.connect('42');          // member (omit it for a StaticDatabox)
 console.log(profile.data);            // readonly data
 ```
 
-`connect` fetches the first data automatically (`autoFetch`, default `true`). 
-The Databox reconnects automatically after a connection loss and reloads missed changes using the reload strategy.
+`connect` fetches the first data automatically (`autoFetch`, default `true`): the server sends it with the connect response.
+The Databox reconnects automatically after a connection loss. It tells the server where its data stands and gets, in one round trip,
+nothing (unchanged), the missed changes or the data. Older servers and cases the server can not tell use the reload strategy.
+See [Databox Protocol](guides/databoxProtocol.md).
 
 ## Options
 

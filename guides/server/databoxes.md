@@ -202,6 +202,11 @@ protected onReceivedSignal(connection: DbInConnection<string>, signal: string, d
 | `unregisterDelay` | `120000` | Delay before an unused member is cleaned up. |
 | `fetchLastTransactionData` | `500` | Timeout to fetch the last transaction from other servers in a cluster. |
 | `batch` | `0` | Bundling of outgoing packages: `0` bundles the packages of one event loop turn and sends them at its end (no timer), a number above 0 waits up to that many ms, `null` sends each package directly. |
+| `historyLength` | `100` | Last transactions the Databox (each member) keeps to resume clients after a lost connection; `0` keeps none. |
+| `historySize` | `65536` | Maximum size of these transactions in characters of JSON. |
+
+A client that comes back after a lost connection gets the missed transactions while they are kept, otherwise the data, in one round trip.
+See [Databox Protocol](guides/databoxProtocol.md).
 
 ## Using Databoxes in Other Components
 

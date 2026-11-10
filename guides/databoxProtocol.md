@@ -193,6 +193,8 @@ An update with `potentialInsert`, an `insert` with `potentialUpdate` or a `delet
 
 Fetched data takes `max(now + lead, newest)`: never older than a transaction the server saw, and not behind the clocks of the other servers, so a transaction that comes late (a broker connection that was down sends its buffer when it is back) does not override newer data. The newest timestamp of fetched data per member is kept: a transaction of another server that is older than it and still takes in the shadow (the clients that loaded rejected it, the data may not hold it) makes the clients of this server reload. With clocks seconds apart this happens until the server whose clock runs behind saw a transaction of the one that runs ahead.
 
+A new member asks the other servers for the last transaction data once more when its subscription becomes active (answers to the first request, sent before, can be lost). Limit: a server that just started and has not heard the clock of a server that runs seconds ahead (its broker connection is down) can let a transaction of that server, which comes late from its buffer, override newer data on its clients until the next change of the key.
+
 ### Compatibility
 
 * Older clients apply the transactions as before (they ignore the fraction).

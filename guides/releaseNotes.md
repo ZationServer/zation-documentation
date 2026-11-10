@@ -6,6 +6,7 @@
 
 * `batch: 0` bundles the packages of one event loop turn and sends them at its end, without a timer. Before, `0` sent each package directly. `null` still sends directly.
 * The default `batch` of Databoxes and Channels is `0` instead of `100` ms: a single change goes out at once, changes made together still go out as one message.
+* The buffers of one turn flush with one callback (ziron-engine), not one `setImmediate` each.
 
 ### Databox `content().sync`
 
@@ -18,6 +19,12 @@
 
 * `data` and the data of `dataChange` are immutable snapshots: a change copies the objects and arrays on its path, every other part keeps its identity.
 * Don't change them. To change the data, use `getDataClone()`.
+* After a transaction, only the components it creates get the comparators and value mergers of the storage (a constraint with a query still checks all). Before, a comparator without a selector went through the whole data with each transaction.
+* Fixed: a comparator or value merger with a selector of more than one key selected other components or none from its second update on.
+
+### Databox Transactions
+
+* A transaction is converted to JSON once for the history and the clients (without complex types and a transaction middleware). With the history and the other small changes, a transaction takes about 0.6 µs on the server that receives it from another server instead of 1.2 µs, and 1.4 µs on the server that emits it instead of 2.1 µs.
 
 ### React
 

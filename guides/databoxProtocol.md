@@ -115,3 +115,56 @@ In a cluster with old and new servers, a client can move between them: on an old
 * **Changes during the resume:** the response covers everything up to `n`, later changes come as packages; nothing is applied twice.
 * **Forced reloads:** a client that comes back to the server gets the data. On another server, too, while the reload is in its history. As before, `forceReload` only reaches connected clients for sure; use `anyContentChange` for changes everyone has to get.
 * **`content().sync`:** missed synced transactions come in order, so each fits its base.
+
+## Cluster: Missed Transactions
+
+Servers pass transactions to each other over the broker. Before zation-server 3.0.0-beta.3, a server could miss one without noticing (its broker connection was cut, the broker restarted, a publish was lost on the way, a subscribe was cut, the server that emitted died) and its clients kept wrong data until the next reload.
+
+### Guarantee
+
+A client never keeps wrong data: when a transaction may be missing, its server (or the client itself) reloads the data from the source. In between, data can be out of date. A server, after its broker connection was cut, answers resumes with the data until its subscription is active again.
+
+What it takes from the application: write the source before emitting, as before. Changes of the same key from several servers need timestamps in the order of the source (`timestamp` option) and the forms that do not depend on the order: `update` with `potentialInsert`, `insert` with `potentialUpdate`, and `delete`. A plain `insert`/`update` of a missing key, `if` conditions and list indexes depend on the order in which the transactions come; for those, use one writer per Databox (member) or `content().sync`.
+
+### How a Server Notices
+
+| Case | Noticed by | Then |
+| --- | --- | --- |
+| Its subscription at the broker was cut (connection lost, broker restarted, channel moved to another broker) | ziron: `onSubscriptionChange(channel, false)` | The member is unsure: resumes get the data. When the subscription is active again (`true`), its clients reload, the history takes a position (no resume across it) and the last transaction id becomes unknown. |
+| A new member: its subscription is not active yet | `isSubscriptionActive(channel)` | It waits up to 1 s before it serves clients. Clients that got data or `lt` before the subscription was active reload then. |
+| Its own publish may not have reached the broker (not confirmed before the connection broke, buffered in a pool that was dropped, no broker) | ziron: `onPublishLoss(channel)` | It sends a gap notice; every other server resets the member (reload, history position, unknown last transaction id). |
+| A transaction of another server is missing between two that came (or came in another order) | the chain (`k`, `q`) | The server does not pass the transaction on, it resets the member. |
+| Another server left the cluster (it can not tell about its lost publishes), or this server joined the state server again | ziron: state client `workerLeave` | It resets every member. |
+
+ziron confirms the publishes of a broker connection with one acknowledged publish in the unused channel `#barrier` per round trip (the broker processes the messages of a connection in order). A subscribe that was cut by a lost connection is repeated.
+
+### Fields
+
+| Field | Where | Meaning |
+| --- | --- | --- |
+| `k` | transaction (between servers and to clients) | The chain: the transactions of one server for this Databox (member). A server keeps 10000 chains per Databox; a member that comes back after that starts a new chain. |
+| `q` | transaction | Position in the chain. The next transaction of the chain has `q + 1`. |
+| `g` | reload package of a broadcast (between servers only) | Gap notice with the chain head `[k, q]` of the sending server (or `1`). The receiving servers send their clients a plain reload. |
+
+Clients with a transaction middleware get transactions without `k` and `q`: they do not get every transaction of a chain.
+
+### Client
+
+A client follows the chains since its data was loaded (up to 64 chains). A transaction whose chain skips a position is not applied: the client reloads, like a synced transaction with another base. A reload or data from the connect response starts the chains anew.
+A delete of a key the client does not have keeps its timestamp: an older set of another server that comes later does not bring the key back.
+
+### Compatibility
+
+* Older clients ignore `k` and `q`. Older servers pass `k` and `q` on to their clients: a new client then notices a gap they did not (with a transaction middleware on such a server, it reloads more often than needed).
+* Older servers take a gap notice as a forced reload of their clients.
+* Without ziron 9.12.0 (ziron-worker, ziron-server, ziron-state) the signals are missing; the chain still catches a gap between two transactions of a server.
+
+### Cost
+
+| What | Cost |
+| --- | --- |
+| Chain per transaction | about 25 bytes (`"k":"…","q":…`), 0.04 µs to emit, 0.03 µs to check |
+| Barrier | one acknowledged publish (about 30 bytes, answer about 10 bytes) per round trip and broker connection, only while publishing |
+| Memory | up to 64 followed chains per member (server and client), up to 10000 own chains per Databox |
+| Reloads | a cut subscription, a lost publish or a server that left reloads the clients of the members concerned (on a server that left: every member of the other servers) |
+

@@ -33,6 +33,21 @@
 * Every combination of old and new clients and servers works; see [Databox Protocol](guides/databoxProtocol.md).
 * Databox tokens are valid on every server of a cluster. Before, each server signed them with its own secret, so a client reloaded after every server switch.
 
+### Missed Transactions in a Cluster
+
+* A client never keeps wrong data when its server missed a transaction of another server: the client reloads. Before, a cut broker connection, a broker restart, a publish lost on the way, a cut subscribe or a server that died with unsent transactions left clients with wrong data until the next reload.
+* Each transaction carries its chain (`k`, `q`): the transactions of one server for a Databox (member). A server or client that sees a position skipped reloads instead of applying it.
+* While its subscription at the broker is cut, a server answers resumes with the data; when it is active again, its clients reload. A new member waits up to 1 s for its subscription.
+* A server whose publishes may not have reached the broker sends a gap notice; when a server leaves the cluster, the others reload the clients of all their members.
+* A delete of a key the client does not have keeps its timestamp, so an older set of another server that comes later does not bring the key back.
+* See [Databox Protocol](guides/databoxProtocol.md#cluster-missed-transactions) for the fields, what the application has to do and the cost.
+
+### ziron Cluster
+
+* The channel exchange tells whether a subscription at the broker is active (`isSubscriptionActive`), when it becomes active or is cut (`onSubscriptionChange`) and about publishes that may not have reached the broker (`onPublishLoss`).
+* The broker pool repeats a subscribe that a lost connection cut; before, the server missed the channel until it subscribed again. A channel that moves to another broker stays subscribed at the old one for 5 s.
+* The state server tells the workers when a worker leaves (`workerLeave`).
+
 ### Connection
 
 * ziron-client 9.12.0 drops a connection whose ping timeout has passed by the wall clock when the page becomes visible or the network comes back. After a device slept, it reconnects at once instead of after up to 10 s.
@@ -40,10 +55,10 @@
 ### Order of Publishing
 
 1. `ziron-engine` 2.6.0
-2. `ziron-server` and `ziron-client` 9.12.0 (with `ziron-engine` 2.6.0), then `ziron-worker`, `ziron-broker` and `ziron-state` 9.12.0
-3. `zation-server` 3.0.0-beta.3 (`ziron-worker` 9.12.0) and `zation-client` 3.0.0-beta.2 (`ziron-client` 9.12.0) together
+2. `ziron-server` and `ziron-client` 9.12.0 (with `ziron-engine` 2.6.0), then `ziron-worker`, `ziron-broker` and `ziron-state` 9.12.0 (`ziron-worker` with the broker signals and `workerLeave`, `ziron-state` with `workerLeave`)
+3. `zation-server` 3.0.0-beta.3 (`ziron-worker` 9.12.0) and `zation-client` 3.0.0-beta.2 (`ziron-client` 9.12.0) together; `zation-state` and `zation-broker` with `ziron-state` and `ziron-broker` 9.12.0
 4. `zation-react-toolkit` 1.8.0 (peer `zation-client` ^3.0.0-beta.2)
 
 With an older `ziron-engine`, `batch: 0` sends each package directly.
 zation-server and zation-client can be published in either order for the Databox protocol: each works with the older version of the other.
-Afterwards, zation-integration-test takes the new zation-server and zation-client; its resume tests need protocol version 1.
+Afterwards, zation-integration-test takes the new zation-server and zation-client; its resume tests need protocol version 1, its cluster loss tests and the soak run (`soak/run.ts`) the chain and ziron 9.12.0. ziron-integration-tests takes ziron 9.12.0 for its broker loss tests.

@@ -10,6 +10,7 @@
 ### Databox (zation-client)
 
 * A reload, a `fetch()` and a connect with data no longer take a transaction again that the fetched data holds by its chain heads. When the newest transaction a server has seen is ahead of its clock, the fetched data gets its timestamp; the copy of it that the client collected during the fetch then won over a newer change without operations (`anyContentChange`), and the client showed the older value until the key changed again. A fetch of a reload without data, data that a reload strategy did not fetch and a server without chain heads keep the old way.
+* This needs what [Update Content](guides/server/databoxes.md#update-content) asks for: inform the Databox after the write is visible to the fetch. A change told before the write, or a fetch from a replica or a cache that lags behind, now leaves the old value after a reload too, until the next change.
 * No protocol change, zation-server stays as it is.
 
 ### Databox (zation-server)

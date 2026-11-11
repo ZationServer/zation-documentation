@@ -83,7 +83,7 @@ When the client fetches more data, the new data is merged with the existing data
 ## Update Content
 
 Whenever the underlying data changes, inform the Databox so that all connected clients are updated.
-Use the `content` API (typically after updating your database):
+Use the `content` API after updating your database:
 
 ```typescript
 // StaticDatabox
@@ -95,6 +95,8 @@ this.content().filterByKey('42').delete();
 this.content(userId).update({name: 'Luca', age: 23});
 this.content(userId).insert('nickname', 'lu');
 ```
+
+Inform the Databox after the write is visible to the fetch. A client takes fetched data as holding every change that the server told before the fetch. A change told before the write, or a fetch that reads from a replica or a cache that lags behind, leaves the clients with the old value until the next change.
 
 The selectors navigate through the data. `filterByKey`, `filterByValue` and `filterByPair` accept [queric](https://www.npmjs.com/package/queric) queries, `all()` selects all items:
 

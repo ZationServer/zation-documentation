@@ -161,6 +161,8 @@ Every operation accepts options:
 | `code`, `metadata` | Custom information passed to the client's data change listeners. |
 | `processComplexTypes` | Enable when the value contains binaries or streams. |
 
+A change without operations (`anyContentChange`) counts at the time of the server. When your timestamps can run ahead of that clock (several changes in one millisecond, a clock of your own), give it one of them too (`this.anyContentChange(member, {timestamp})`): otherwise an earlier change with a later timestamp can win over it on the clients of a server that it reaches after they reloaded.
+
 ## Other Methods
 
 ```typescript

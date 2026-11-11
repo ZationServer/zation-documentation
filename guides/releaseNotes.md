@@ -1,11 +1,36 @@
 # Release Notes
 
-## Unreleased: ziron-client, zation-client
+## ziron-client 9.14.0, zation-client 3.0.0-beta.6, zation-server 3.0.0-beta.6, zation-assured 3.0.0-beta.6, zation 3.0.0-beta.6, zation-state 8.0.0-beta.4, zation-broker 8.0.0-beta.4, zation-react-toolkit 1.9.1
 
-### Reconnect
+### Reconnect (ziron-client 9.14.0, zation-client)
 
 * An attempt that the events of a browser bring forward (visible page, `online`, `pageshow`) comes after a random delay of up to `autoReconnect.resumeRandomness` (default 500 ms, `0` turns it off): many clients that get the same event, e.g. when the network of a site comes back, no longer come back in the same moment. Several events at once keep the first random plan.
 * `client.reconnectNow(true)` does the same for the events of other environments (Electron `powerMonitor` `resume`, React Native `AppState`). `client.reconnectNow()` without it, e.g. for a button, still tries at once.
+
+### Databox (zation-client)
+
+* A reload, a `fetch()` and a connect with data no longer take a transaction again that the fetched data holds by its chain heads. When the newest transaction a server has seen is ahead of its clock, the fetched data gets its timestamp; the copy of it that the client collected during the fetch then won over a newer change without operations (`anyContentChange`), and the client showed the older value until the key changed again. A fetch of a reload without data, data that a reload strategy did not fetch and a server without chain heads keep the old way.
+* No protocol change, zation-server stays as it is.
+
+### Databox (zation-server)
+
+* `anyContentChange` counts at the time of the server. When your timestamps can run ahead of it, give it one of them too (`{timestamp}`), see [Options](guides/server/databoxes.md#options). zation-server 3.0.0-beta.6 only takes `ziron-worker` 9.14.0; its tests check the shadow against the storage of zation-client.
+
+### React (zation-react-toolkit 1.9.1)
+
+* A failed connect reaches every `onError` of the components that hold the Databox, also when one of them throws; the thrown error goes to `console.error`. Before, the others missed it and it became an unhandled rejection.
+* The peer dependency stays `zation-client` `^3.0.0-beta.5`.
+
+### zation (CLI) 3.0.0-beta.6
+
+* New projects start with zation-server, zation-client and zation-assured 3.0.0-beta.6 and zation-state and zation-broker 8.0.0-beta.4.
+
+### Order of Publishing
+
+1. `ziron-client` 9.14.0, then `ziron-server`, `ziron-worker`, `ziron-broker` and `ziron-state` 9.14.0 (only `ziron-client` changes, the others take it so the family stays one version; `ziron-engine` stays 2.6.0)
+2. `zation-server` 3.0.0-beta.6 (`ziron-worker` 9.14.0) and `zation-client` 3.0.0-beta.6 (`ziron-client` 9.14.0); `zation-state` and `zation-broker` 8.0.0-beta.4 with `ziron-state` and `ziron-broker` 9.14.0 (only the pins); `zation-assured` 3.0.0-beta.6 (`zation-client` 3.0.0-beta.6)
+3. `zation` (CLI) 3.0.0-beta.6: new projects start with these versions
+4. `zation-react-toolkit` 1.9.1
 
 ## zation-server 3.0.0-beta.5, zation-client 3.0.0-beta.5, zation-assured 3.0.0-beta.5, zation 3.0.0-beta.5, zation-state 8.0.0-beta.3, zation-broker 8.0.0-beta.3, zation-react-toolkit 1.9.0
 

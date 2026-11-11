@@ -46,7 +46,7 @@ await client.request('profile/get');
 | `port` | page port / 80 / 443 | Port of the server. |
 | `secure` | page protocol | Use TLS (`wss`). |
 | `path` | `'/'` | Path of the server. |
-| `autoReconnect` | active | Reconnect options: `active`, `initialDelay` (5000), `multiplier` (1.5), `randomness` (5000), `maxDelay` (60000), `delays` (fixed delays instead), `afterNormalClose` (`false`), see [Reconnect](#reconnect). |
+| `autoReconnect` | active | Reconnect options: `active`, `initialDelay` (5000), `multiplier` (1.5), `randomness` (5000), `maxDelay` (60000), `delays` (fixed delays instead), `afterNormalClose` (`false`), `resumeRandomness` (500), see [Reconnect](#reconnect). |
 | `rejectUnauthorized` | `false` | Reject self-signed certificates (Node.js). |
 | `debug` | `false` | Log status information and errors. |
 | `system` | `'Default'` | Name of the client system (e.g. `ios`, `web`), checked against `allowedSystems`. |
@@ -101,23 +101,25 @@ client.onNextReconnectChange((at) => {
 });
 ```
 
-### At Once When the App Comes Back
+### When the App Comes Back
 
 Timers can stand still while a device sleeps (e.g. an iOS web app from the home screen): the connection is dead, and the planned attempt would come late. `client.reconnectNow()` brings a planned reconnect forward to now. Before, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock; such a connection then reconnects at once. While the connection is fine or no reconnect is planned, nothing happens.
 
-In browsers (also the renderer of Electron), the client calls it by itself when the page becomes visible (`visibilitychange`), the network comes back (`online`) or the page is shown again (`pageshow`). It only looks for these events and works without them. Other environments call it themselves:
+In browsers (also the renderer of Electron), the client calls `reconnectNow(true)` by itself when the page becomes visible (`visibilitychange`), the network comes back (`online`) or the page is shown again (`pageshow`). It only looks for these events and works without them. Other environments call it themselves:
 
 ```typescript
 // Electron (main process)
 import {powerMonitor} from 'electron';
-powerMonitor.on('resume', () => client.reconnectNow());
+powerMonitor.on('resume', () => client.reconnectNow(true));
 
 // React Native
 import {AppState} from 'react-native';
 AppState.addEventListener('change', (state) => {
-    if(state === 'active') client.reconnectNow();
+    if(state === 'active') client.reconnectNow(true);
 });
 ```
+
+Many clients can get such an event at the same moment, e.g. when the network of a site with many devices comes back. With `true`, the attempt comes after a random delay of up to `autoReconnect.resumeRandomness` (default 500 ms), so they do not all come back in the same moment; `0` turns it off. Without `true`, e.g. for a button of the user, the attempt comes at once.
 
 In Node.js without such an event, the client reconnects by its delays.
 

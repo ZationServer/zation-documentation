@@ -4,7 +4,7 @@
 
 ### Reconnect (ziron-client 9.14.0, zation-client)
 
-* An attempt that the events of a browser bring forward (visible page, `online`, `pageshow`) comes after a random delay of up to `autoReconnect.resumeRandomness` (default 500 ms, `0` turns it off): many clients that get the same event, e.g. when the network of a site comes back, no longer come back in the same moment. Several events at once keep the first random plan.
+* An attempt that the events of a browser bring forward (visible page, `online`, `pageshow`) comes after a random delay of up to `autoReconnect.resumeRandomness` (default 500 ms, `0` turns it off): many clients that get the same event, e.g. when the network of a site comes back, no longer come back in the same moment. Several events at once keep the first random plan, unless the wall clock passed it while the device slept.
 * `client.reconnectNow(true)` does the same for the events of other environments (Electron `powerMonitor` `resume`, React Native `AppState`). `client.reconnectNow()` without it, e.g. for a button, still tries at once.
 
 ### Databox (zation-client)

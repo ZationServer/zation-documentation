@@ -103,7 +103,7 @@ client.onNextReconnectChange((at) => {
 
 ### When the App Comes Back
 
-Timers can stand still while a device sleeps (e.g. an iOS web app from the home screen): the connection is dead, and the planned attempt would come late. `client.reconnectNow()` brings a planned reconnect forward to now. Before, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock; such a connection then reconnects at once. While the connection is fine or no reconnect is planned, nothing happens.
+Timers can stand still while a device sleeps (e.g. an iOS web app from the home screen): the connection is dead, and the planned attempt would come late. `client.reconnectNow()` brings a planned reconnect forward to now. Before, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock; such a connection then reconnects the same way. While the connection is fine or no reconnect is planned, nothing happens.
 
 In browsers (also the renderer of Electron), the client calls `reconnectNow(true)` by itself when the page becomes visible (`visibilitychange`), the network comes back (`online`) or the page is shown again (`pageshow`). It only looks for these events and works without them. Other environments call it themselves:
 

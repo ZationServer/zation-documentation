@@ -80,7 +80,7 @@ The client reconnects automatically after a connection loss. It does not reconne
 
 A server that shuts down (`SIGTERM`) closes with `1001`, so the client reconnects to it after a restart or to another instance.
 
-By default, the first attempt comes after 7.5 to 15 s (`initialDelay` plus up to `randomness`, times `multiplier`), each next one `multiplier` times later, up to `maxDelay`. The randomness spreads the reconnects of many clients after a restart. A ping timeout or a close without status reconnects at once. `delays` sets fixed delays instead, one per attempt in a row, the last one repeats (still up to `maxDelay`):
+By default, the first attempt comes after 7.5 to 15 s (`initialDelay` plus up to `randomness`, times `multiplier`), each next one `multiplier` times later, up to `maxDelay`. The randomness spreads the reconnects of many clients after a restart. A ping timeout or a close without status reconnects at once. `delays` sets fixed delays instead, one per attempt in a row, the last one repeats (still up to `maxDelay`). An attempt at once counts as the first one, so the attempts after it start at `delays[1]`:
 
 ```typescript
 const client = Client.create({

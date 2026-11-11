@@ -103,10 +103,10 @@ A reload sends `resetSession` together with its fetches and does not wait for `c
 
 | Client | Server | Flow |
 | --- | --- | --- |
-| before 3.0.0-beta.2 | before 3.0.0-beta.3 | version 0 |
-| 3.0.0-beta.2 | before 3.0.0-beta.3 | The server ignores `v`, `f` and `r` and answers without `v`: the client works like version 0 (with the faster reload). |
-| before 3.0.0-beta.2 | 3.0.0-beta.3 | No `v`: the server answers like before. The client ignores `n`. |
-| 3.0.0-beta.2 | 3.0.0-beta.3 | version 1 |
+| before 3.0.0-beta.3 | before 3.0.0-beta.3 | version 0 |
+| 3.0.0-beta.3 | before 3.0.0-beta.3 | The server ignores `v`, `f` and `r` and answers without `v`: the client works like version 0 (with the faster reload). |
+| before 3.0.0-beta.3 | 3.0.0-beta.3 | No `v`: the server answers like before. The client ignores `n`. |
+| 3.0.0-beta.3 | 3.0.0-beta.3 | version 1 |
 
 In a cluster with old and new servers, a client can move between them: on an old server it works like version 0, on a new one it resumes by its last transaction id or gets the data.
 
@@ -162,7 +162,7 @@ Fetched data has at least the timestamp of the newest transaction the server saw
 * Older clients ignore `k` and `q`. Older servers pass `k` and `q` on to their clients: a new client then notices a gap they did not (with a transaction middleware on such a server, it reloads more often than needed).
 * Older servers take a gap notice as a forced reload of their clients.
 * Without ziron 9.12.0 (ziron-worker, ziron-server, ziron-state) the signals are missing; the chain still catches a gap between two transactions of a server.
-* Clients of version 0 (before 3.0.0-beta.2) send no resume point: after a reconnect they keep their data when the `lt` of the connect response is their last transaction id. On another server this can hide an older transaction of a third server that came there after it. This was the case before; the chains of new servers do not change it, updated clients do.
+* Clients of version 0 (before 3.0.0-beta.3) send no resume point: after a reconnect they keep their data when the `lt` of the connect response is their last transaction id. On another server this can hide an older transaction of a third server that came there after it. This was the case before; the chains of new servers do not change it, updated clients do.
 
 ### Cost
 

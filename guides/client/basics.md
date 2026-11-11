@@ -46,7 +46,7 @@ await client.request('profile/get');
 | `port` | page port / 80 / 443 | Port of the server. |
 | `secure` | page protocol | Use TLS (`wss`). |
 | `path` | `'/'` | Path of the server. |
-| `autoReconnect` | active | Reconnect options: `active`, `initialDelay` (5000), `multiplier` (1.5), `randomness` (5000), `maxDelay` (60000). |
+| `autoReconnect` | active | Reconnect options: `active`, `initialDelay` (5000), `multiplier` (1.5), `randomness` (5000), `maxDelay` (60000), `delays` (fixed delays instead), `afterNormalClose` (`false`), see [Reconnect](#reconnect). |
 | `rejectUnauthorized` | `false` | Reject self-signed certificates (Node.js). |
 | `debug` | `false` | Log status information and errors. |
 | `system` | `'Default'` | Name of the client system (e.g. `ios`, `web`), checked against `allowedSystems`. |
@@ -68,9 +68,53 @@ await client.reconnect();
 await client.ping();             // round trip time in ms
 ```
 
-Packages sent while the client is disconnected are buffered and flushed after the connection is established (see `sendTimeout` and `maxPackageBufferSize`).
+Packages sent while the client is disconnected are buffered and flushed after the connection is established (see `sendTimeout` and `maxPackageBufferSize`). A request or transmit while disconnected also starts a connect at once.
 
-The client reconnects automatically after a connection loss, except when the connection was closed with code `1000` or a code from `4500` upwards (permanent disconnects, e.g. a block by the socket middleware). Call `connect()` again to retry manually.
+## Reconnect
+
+The client reconnects automatically after a connection loss. It does not reconnect:
+
+* after `disconnect()` (whatever the code), until `connect()` is called again or a request or transmit is sent,
+* after a code from `4500` upwards (permanent disconnects, e.g. a block by the socket middleware),
+* after a normal close of the server (code `1000`, e.g. `socket.disconnect()` on the server or a proxy), unless `afterNormalClose` is `true`.
+
+A server that shuts down (`SIGTERM`) closes with `1001`, so the client reconnects to it after a restart or to another instance.
+
+By default, the first attempt comes after 7.5 to 15 s (`initialDelay` plus up to `randomness`, times `multiplier`), each next one `multiplier` times later, up to `maxDelay`. The randomness spreads the reconnects of many clients after a restart. A ping timeout or a close without status reconnects at once. `delays` sets fixed delays instead, one per attempt in a row, the last one repeats (still up to `maxDelay`):
+
+```typescript
+const client = Client.create({
+    autoReconnect: {delays: [1000, 2000, 3000, 5000], afterNormalClose: true}
+});
+```
+
+`client.nextReconnectAt` is the time (`Date.now()`) of the next attempt while one is planned, otherwise `null` (connected, connecting, after `disconnect()`, after a permanent disconnect). `onNextReconnectChange` tells each change, e.g. for a countdown:
+
+```typescript
+client.onNextReconnectChange((at) => {
+    label.textContent = at === null ? '' : `Next try in ${Math.ceil((at - Date.now()) / 1000)} s`;
+});
+```
+
+### At Once When the App Comes Back
+
+Timers can stand still while a device sleeps (e.g. an iOS web app from the home screen): the connection is dead, and the planned attempt would come late. `client.reconnectNow()` brings a planned reconnect forward to now. Before, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock; such a connection then reconnects at once. While the connection is fine or no reconnect is planned, nothing happens.
+
+In browsers (also the renderer of Electron), the client calls it by itself when the page becomes visible (`visibilitychange`), the network comes back (`online`) or the page is shown again (`pageshow`). It only looks for these events and works without them. Other environments call it themselves:
+
+```typescript
+// Electron (main process)
+import {powerMonitor} from 'electron';
+powerMonitor.on('resume', () => client.reconnectNow());
+
+// React Native
+import {AppState} from 'react-native';
+AppState.addEventListener('change', (state) => {
+    if(state === 'active') client.reconnectNow();
+});
+```
+
+In Node.js without such an event, the client reconnects by its delays.
 
 ## Authentication
 

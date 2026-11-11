@@ -11,10 +11,11 @@ Without a client, the hooks use the primary client.
 | Hook | Returns |
 | --- | --- |
 | `useClient()` | The primary client. |
-| `useDatabox(client?, identifier, member?, options?)` | The connected Databox, with `withTracking()` and `withSelector(selector, isEqual?)`. `options.enabled: false` does not connect it. |
+| `useDatabox(client?, identifier, member?, options?)` | The connected Databox, with `withTracking()` and `withSelector(selector, isEqual?)`. `options.enabled: false` does not connect it, `options.onError` gets a failed connect. |
 | `useDataboxTracking(databox)` | The data; re-renders on every change. |
 | `useDataboxSelector(databox, selector, isEqual?)` | The selected part; re-renders only when it changes. |
 | `useConnected(client?)` | Whether the client is connected. |
+| `useNextReconnect(client?)` | When the client tries to reconnect (`Date.now()` time), `null` while none is planned. |
 | `useAuthenticated(client?)` | Whether the client is authenticated. |
 | `useAuthTokenPayload(client?)` | The token payload, `null` without a token; re-renders with each new token. |
 | `useRequest(request, isEnabled?)` | `{data, error, reload}` of a request. |
@@ -37,6 +38,12 @@ A hook can not be called conditionally. For data that is only wanted after a log
 const [identity] = useDatabox('identity', undefined, {enabled: loggedIn}).withTracking();
 ```
 
+A connect that fails (no access, an unknown identifier) goes to `onError` of the components that hold the Databox, without one to `console.error`. The Databox stays active and connects when the connection comes back. `onError` is not part of the options the components share by either.
+
+```ts
+const [cinema] = useDatabox('cinema', undefined, {onError: (err) => report(err)}).withTracking();
+```
+
 ## Connection and Authentication
 
 ```typescript
@@ -45,7 +52,23 @@ const authenticated = useAuthenticated();
 const payload = useAuthTokenPayload();
 ```
 
-`useConnected` re-renders on connect and disconnect, `useAuthenticated` and `useAuthTokenPayload` on authenticate and deauthenticate. Reconnecting stays with the client, see [Events](guides/client/events.md).
+`useConnected` re-renders on connect and disconnect, `useAuthenticated` and `useAuthTokenPayload` on authenticate and deauthenticate. Reconnecting stays with the client, see [Reconnect](guides/client/basics.md#reconnect).
+
+`useNextReconnect` re-renders when the planned attempt changes, not every second. A countdown renders itself:
+
+```tsx
+function Reconnecting() {
+    const at = useNextReconnect();
+    const [now, setNow] = useState(Date.now());
+    useEffect(() => {
+        if(at === null) return;
+        const timer = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(timer);
+    }, [at]);
+    if(at === null) return null;
+    return <span>Next try in {Math.max(0, Math.ceil((at - now) / 1000))} s <button onClick={() => client.reconnectNow()}>Now</button></span>;
+}
+```
 
 ## Requests
 

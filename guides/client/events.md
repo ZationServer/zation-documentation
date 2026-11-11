@@ -4,8 +4,9 @@ The client emits events for the connection and authentication state.
 
 ```typescript
 client.onConnect((initial) => {});                 // initial: first connect or reconnect
-client.onDisconnect((code, reason, permanent) => {});
+client.onDisconnect((code, reason, permanent) => {}); // permanent: no reconnect follows
 client.onConnectAbort((code, reason) => {});
+client.onNextReconnectChange((at) => {});           // the next attempt (Date.now() time) or null
 client.onAuthenticate(() => {});
 client.onDeauthenticate(() => {});
 client.onError((err) => {});

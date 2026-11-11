@@ -1,6 +1,6 @@
 # Release Notes
 
-## zation-server 3.0.0-beta.5
+## zation-server 3.0.0-beta.5, zation-client 3.0.0-beta.5, zation-assured 3.0.0-beta.5, zation 3.0.0-beta.5, zation-react-toolkit 1.9.0
 
 ### Databox `content().sync` of key arrays
 
@@ -9,6 +9,33 @@
 * Several servers: per item, the newer timestamp wins on every client, and a removed item keeps its timestamp. Two servers that add items to the same key array at once make the clients of every server reload when they would hold the items in a different order.
 * One changed field of an item of 370 (each about 280 bytes) goes out as about 180 bytes instead of 410 for the item at its index or 104 KB for the list; four changed fields of the same item as about 400 bytes (the key of the item is part of the path of each change).
 * No protocol change, the clients stay as they are: a client takes a path into a key array by the key of the item, as with the other operations on key arrays.
+
+### Reconnect (zation-client, ziron-client 9.13.0)
+
+* `autoReconnect.afterNormalClose` (default `false`): the client also reconnects when the server closed the connection normally (`1000`, e.g. `socket.disconnect()` on the server or a proxy). zation-server itself closes with `1001` when it shuts down, so a restart of it already reconnected and still does.
+* `autoReconnect.delays`: fixed delays, one per attempt in a row, the last one repeats (e.g. `[1000, 2000, 3000, 5000]`). They replace `initialDelay`, `randomness` and `multiplier`; `maxDelay` still caps them. The default delays stay as they were (7.5 to 15 s first, then times 1.5 up to 60 s): the randomness spreads the reconnects of many clients after a restart.
+* `client.nextReconnectAt` (a `Date.now()` time, `null` while none is planned) and `onNextReconnectChange` tell when the next attempt comes, e.g. for a countdown. The plan is made before the disconnect events, so their listeners see it and a `disconnect()` there cancels it.
+* `client.reconnectNow()` brings a planned reconnect forward to now. First, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock (timers stand still while a device sleeps); such a connection reconnects at once.
+* In browsers (and the renderer of Electron), the client calls it by itself when the page becomes visible, the network comes back (`online`) or the page is shown again (`pageshow`), from `connect()` until it stops reconnecting. It only looks for `document` and `window` and needs neither. Elsewhere, call it on the events of the environment, e.g. `powerMonitor` `resume` in Electron's main process or `AppState` `active` in React Native. In Node.js without such an event, the client reconnects by its delays. See [Reconnect](guides/client/basics.md#reconnect).
+* `disconnect()` stops reconnecting for any code, also one that would reconnect at once (`4000`, `4001`). The `permanent` flag of `onDisconnect` is `true` exactly when no reconnect follows (before: by the code only).
+* Explicitly `undefined` reconnect options keep their defaults.
+
+### Other (zation-client)
+
+* In Node.js, the client measures `ping()` with `performance` instead of `Date` (whole milliseconds): `globalThis.performance`, before a dynamic require of `perf_hooks` that never worked in the bundle.
+
+### React (zation-react-toolkit 1.9.0)
+
+* `useNextReconnect(client?)` returns `nextReconnectAt` and re-renders when the plan changes.
+* `useDatabox` reports a failed connect (no access, an unknown identifier) to `onError` of the components that hold the Databox, without one to `console.error`. Before, the error was swallowed. `onError` is not part of the options the components share by.
+* The peer dependency is `zation-client` `^3.0.0-beta.5`.
+
+### Order of Publishing
+
+1. `ziron-client` 9.13.0, then `ziron-server`, `ziron-worker`, `ziron-broker` and `ziron-state` 9.13.0 (only `ziron-client` changes, the others take it so the family stays one version; `ziron-engine` stays 2.6.0)
+2. `zation-server` 3.0.0-beta.5 (`ziron-worker` 9.13.0) and `zation-client` 3.0.0-beta.5 (`ziron-client` 9.13.0); `zation-state` and `zation-broker` 8.0.0-beta.3 with `ziron-state` and `ziron-broker` 9.13.0 (only the pins); `zation-assured` 3.0.0-beta.5
+3. `zation` (CLI) 3.0.0-beta.5: new projects start with these versions
+4. `zation-react-toolkit` 1.9.0 (peer `zation-client` `^3.0.0-beta.5`)
 
 ## zation-client 3.0.0-beta.4, zation-server 3.0.0-beta.4, zation-assured 3.0.0-beta.4, zation 3.0.0-beta.4
 

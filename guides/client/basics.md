@@ -88,11 +88,16 @@ const client = Client.create({
 });
 ```
 
-`client.nextReconnectAt` is the time (`Date.now()`) of the next attempt while one is planned, otherwise `null` (connected, connecting, after `disconnect()`, after a permanent disconnect). `onNextReconnectChange` tells each change, e.g. for a countdown:
+`client.nextReconnectAt` is the time (`Date.now()`) of the next attempt while one is planned, otherwise `null` (connected, connecting, after `disconnect()`, after a permanent disconnect). `onNextReconnectChange` tells each change in order, the last value a listener gets is the current one (also when a listener calls `reconnectNow()`), e.g. for a countdown:
 
 ```typescript
+let ticker;
 client.onNextReconnectChange((at) => {
-    label.textContent = at === null ? '' : `Next try in ${Math.ceil((at - Date.now()) / 1000)} s`;
+    clearInterval(ticker);
+    const show = () => label.textContent = at === null ? '' :
+        `Next try in ${Math.max(0, Math.ceil((at - Date.now()) / 1000))} s`;
+    show();
+    if(at !== null) ticker = setInterval(show, 1000);
 });
 ```
 

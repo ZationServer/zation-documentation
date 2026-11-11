@@ -1,12 +1,13 @@
 # Release Notes
 
-## zation-server 3.0.0-beta.5, zation-client 3.0.0-beta.5, zation-assured 3.0.0-beta.5, zation 3.0.0-beta.5, zation-react-toolkit 1.9.0
+## zation-server 3.0.0-beta.5, zation-client 3.0.0-beta.5, zation-assured 3.0.0-beta.5, zation 3.0.0-beta.5, zation-state 8.0.0-beta.3, zation-broker 8.0.0-beta.3, zation-react-toolkit 1.9.0
 
 ### Databox `content().sync` of key arrays
 
 * `sync` compares a key array (`buildKeyArray`) item by item, by the key of each item, like the keys of an object: a changed item sends what changed in it, a removed item a delete, a new item an insert at the end. Before, a key array went whole with every change.
 * The order holds: the clients keep the order of the items they hold and append new ones. An item that moves, or a new item before one the clients hold, sends the key array whole.
-* Several servers: per item, the newer timestamp wins on every client, and a removed item keeps its timestamp. Two servers that add items to the same key array at once make the clients of every server reload when they would hold the items in a different order.
+* Several servers: per item, the newer timestamp wins on every client, and a removed item keeps its timestamp. Two servers that add items to the same key array at once with `sync` (also the same item) make the clients of every server reload when they would hold the items in a different order. An `insert` of another server that adds an item makes the next `sync` go whole (as before), which brings the clients to one order. Known limit: an upsert (`potentialInsert`/`potentialUpdate`) that adds an item on a server that does not `sync` the key array, at the same time as a `sync` of another server, can leave the order of the clients apart until the key array goes whole. See [Several writers](guides/server/databoxes.md#sync-the-whole-content).
+* Many deletes go whole: a delete costs a client a pass over the key array, so a `sync` whose deletes times the items before are more than 64 times the items after sends the key array whole (5,000 of 10,000 items: about 6 ms on the client instead of 650 ms, 3 ms instead of 23 ms on the server). The same after 1024 deleted items (or as many as the key array holds), which the server and the clients keep with their timestamps until then.
 * One changed field of an item of 370 (each about 280 bytes) goes out as about 180 bytes instead of 410 for the item at its index or 104 KB for the list; four changed fields of the same item as about 400 bytes (the key of the item is part of the path of each change).
 * No protocol change, the clients stay as they are: a client takes a path into a key array by the key of the item, as with the other operations on key arrays.
 
@@ -17,12 +18,18 @@
 * `client.nextReconnectAt` (a `Date.now()` time, `null` while none is planned) and `onNextReconnectChange` tell when the next attempt comes, e.g. for a countdown. The plan is made before the disconnect events, so their listeners see it and a `disconnect()` there cancels it.
 * `client.reconnectNow()` brings a planned reconnect forward to now. First, it drops an open connection whose ping timeout, or a connect whose connect timeout, has passed by the wall clock (timers stand still while a device sleeps); such a connection reconnects at once.
 * In browsers (and the renderer of Electron), the client calls it by itself when the page becomes visible, the network comes back (`online`) or the page is shown again (`pageshow`), from `connect()` until it stops reconnecting. It only looks for `document` and `window` and needs neither. Elsewhere, call it on the events of the environment, e.g. `powerMonitor` `resume` in Electron's main process or `AppState` `active` in React Native. In Node.js without such an event, the client reconnects by its delays. See [Reconnect](guides/client/basics.md#reconnect).
-* `disconnect()` stops reconnecting for any code, also one that would reconnect at once (`4000`, `4001`). The `permanent` flag of `onDisconnect` is `true` exactly when no reconnect follows (before: by the code only).
+* `disconnect()` stops reconnecting for any code, also one that would reconnect at once (`4000`, `4001`). The `permanent` flag of `onDisconnect` is `true` exactly when no reconnect follows (before: by the code only). With `autoReconnect` inactive, it stays by the code as before: `true` for `1000` and from `4500` upwards.
+* `nextReconnectChange` tells the changes in order to every listener, also when one of them calls `reconnectNow()`, `connect()` or `disconnect()`; a listener of the disconnect that throws no longer keeps the plan from being told.
 * Explicitly `undefined` reconnect options keep their defaults.
 
 ### Other (zation-client)
 
+* A raw key array with a `null` item no longer throws on the client; the item is left out like one without a key (the server already did so).
 * In Node.js, the client measures `ping()` with `performance` instead of `Date` (whole milliseconds): `globalThis.performance`, before a dynamic require of `perf_hooks` that never worked in the bundle.
+
+### zation (CLI) 3.0.0-beta.5
+
+* New projects start with zation-server, zation-client and zation-assured 3.0.0-beta.5 and zation-state and zation-broker 8.0.0-beta.3. The package has no source maps any more.
 
 ### React (zation-react-toolkit 1.9.0)
 

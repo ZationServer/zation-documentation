@@ -38,7 +38,7 @@ A hook can not be called conditionally. For data that is only wanted after a log
 const [identity] = useDatabox('identity', undefined, {enabled: loggedIn}).withTracking();
 ```
 
-A connect that fails (no access, an unknown identifier) goes to `onError` of the components that hold the Databox, without one to `console.error`. The Databox stays active and connects when the connection comes back. `onError` is not part of the options the components share by either.
+A connect that fails (no access, an unknown identifier) goes to `onError` of the components that hold the Databox, without one to `console.error`. An `onError` that throws goes to `console.error` too, the others still get the error. The Databox stays active and connects when the connection comes back. `onError` is not part of the options the components share by either.
 
 ```ts
 const [cinema] = useDatabox('cinema', undefined, {onError: (err) => report(err)}).withTracking();
